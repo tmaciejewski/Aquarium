@@ -45,7 +45,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_aqua_OBJECTS = aqua-aqua.$(OBJEXT)
+am_aqua_OBJECTS = aqua.$(OBJEXT) model.$(OBJEXT)
 aqua_OBJECTS = $(am_aqua_OBJECTS)
 aqua_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -57,6 +57,10 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(aqua_SOURCES)
 DIST_SOURCES = $(aqua_SOURCES)
 ETAGS = etags
@@ -68,7 +72,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CPPFLAGS = @CPPFLAGS@
+CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\"
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -145,8 +149,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-aqua_SOURCES = aqua.cpp
-aqua_CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\"
+aqua_SOURCES = aqua.cpp model.hpp model.cpp
 all: all-am
 
 .SUFFIXES:
@@ -228,7 +231,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aqua-aqua.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aqua.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -243,20 +247,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-aqua-aqua.o: aqua.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aqua_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT aqua-aqua.o -MD -MP -MF $(DEPDIR)/aqua-aqua.Tpo -c -o aqua-aqua.o `test -f 'aqua.cpp' || echo '$(srcdir)/'`aqua.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/aqua-aqua.Tpo $(DEPDIR)/aqua-aqua.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='aqua.cpp' object='aqua-aqua.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aqua_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o aqua-aqua.o `test -f 'aqua.cpp' || echo '$(srcdir)/'`aqua.cpp
-
-aqua-aqua.obj: aqua.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aqua_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT aqua-aqua.obj -MD -MP -MF $(DEPDIR)/aqua-aqua.Tpo -c -o aqua-aqua.obj `if test -f 'aqua.cpp'; then $(CYGPATH_W) 'aqua.cpp'; else $(CYGPATH_W) '$(srcdir)/aqua.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/aqua-aqua.Tpo $(DEPDIR)/aqua-aqua.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='aqua.cpp' object='aqua-aqua.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(aqua_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o aqua-aqua.obj `if test -f 'aqua.cpp'; then $(CYGPATH_W) 'aqua.cpp'; else $(CYGPATH_W) '$(srcdir)/aqua.cpp'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

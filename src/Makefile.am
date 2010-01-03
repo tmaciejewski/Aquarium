@@ -1,4 +1,4 @@
 bin_PROGRAMS = aqua
 
-aqua_SOURCES = aqua.cpp
-aqua_CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\"
+CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\"
+aqua_SOURCES = aqua.cpp model.hpp model.cpp
