@@ -1,4 +1,4 @@
-//      model.h
+//      model.hpp
 //
 //      Copyright 2010 Tomasz Maciejewski <ponton@jabster.pl>
 //
@@ -21,16 +21,30 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <fstream>
+#include <GL/gl.h>
+#include <GL/glext.h>
+
 class Model
 {
     public:
         Model();
         virtual ~Model();
 
-        void loadObj(const char *);
+        void loadObj(const char *name, GLfloat w = 1.0);
+
+        const GLfloat *getBuffer() { return buffer; }
+        unsigned getCount() { return count; }
+        unsigned getStride() { return stride; }
 
     private:
-        /* add your private declarations */
+        GLfloat *buffer;
+        GLfloat min[3], max[3], weight;
+        size_t count;
+        unsigned stride;
+
+        void clear();
+
 };
 
 #endif /* MODEL_H */

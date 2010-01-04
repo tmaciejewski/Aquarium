@@ -19,19 +19,111 @@
 
 
 #include "model.hpp"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
-
-Model::Model()
+Model::Model() : buffer(NULL)
 {
-
+    clear();
 }
 
 
 Model::~Model()
 {
-
+    clear();
 }
 
-void Model::loadObj(char const*)
+void Model::clear()
 {
+    if (buffer)
+        delete[] buffer;
+
+    min[0] = min[1] = min[2] = 0.0;
+    max[0] = max[1] = max[2] = 0.0;
+
+    weight = 1.0;
+
+    count = 0;
+}
+
+void Model::loadObj(const char *filename, GLfloat w)
+{
+    std::ifstream file(filename);
+    std::vector<GLfloat> v_tmp, vt_tmp, buf;
+    std::string line;
+
+    clear();
+    weight = w;
+
+    std::cout << "Loading model from: " << filename << '\n';
+
+    while(getline(file, line))
+    {
+        if (line.size() > 0 && line[0] != '#')
+        {
+            std::string command;
+            std::istringstream s(line);
+            s >> command;
+
+            if (command == "v")
+            {
+                GLfloat x, y, z;
+                s >> x >> y >> z;
+                v_tmp.push_back(x);
+                v_tmp.push_back(y);
+                v_tmp.push_back(z);
+            }
+            else if (command == "vt")
+            {
+                GLfloat u, v;
+                s >> u >> v;
+                vt_tmp.push_back(u);
+                vt_tmp.push_back(v);
+            }
+            else if (command == "f")
+            {
+                for (unsigned i = 0; i < 3; ++i)
+                {
+                    char c;
+                    unsigned vi, ti;
+                    GLfloat v[3], t[2];
+                    std::string str;
+
+                    s >> str;
+                    std::istringstream(str) >> vi >> c >> ti;
+
+                    --vi;
+                    --ti;
+
+                    v[0] = v_tmp[3 * vi];
+                    v[1] = v_tmp[3 * vi + 1];
+                    v[2] = v_tmp[3 * vi + 2];
+
+                    t[0] = vt_tmp[2 * ti];
+                    t[1] = vt_tmp[2 * ti + 1];
+
+                    buf.push_back(v[0]);
+                    buf.push_back(v[1]);
+                    buf.push_back(v[2]);
+                    buf.push_back(weight);
+
+                    buf.push_back(t[0]);
+                    buf.push_back(t[1]);
+
+                    ++count;
+                }
+            }
+            else
+            {
+                std::cout << '\'' << command << "' not implemented\n";
+            }
+        }
+    }
+
+    stride = buf.size() / count;
+
+    buffer = new GLfloat[buf.size()];
+    std::copy(buf.begin(), buf.end(), buffer);
 }

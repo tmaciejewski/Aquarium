@@ -47,7 +47,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_aqua_OBJECTS = aqua.$(OBJEXT) model.$(OBJEXT)
 aqua_OBJECTS = $(am_aqua_OBJECTS)
-aqua_LDADD = $(LDADD)
+aqua_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -72,7 +72,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
-CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\"
+CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
@@ -149,6 +149,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\" -DGL_GLEXT_PROTOTYPES
+aqua_LDADD = -lglut
 aqua_SOURCES = aqua.cpp model.hpp model.cpp
 all: all-am
 
