@@ -26,63 +26,17 @@
 
 Model fish;
 unsigned width = 640, height = 480;
-GLfloat angle;
-
-void cube()
-{
-    glBegin(GL_QUADS);
-        // Front Face
-        glNormal3f( 0.0f, 0.0f, 0.5f);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
-        // Back Face
-        glNormal3f( 0.0f, 0.0f,-0.5f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
-        // Top Face
-        glNormal3f( 0.0f, 0.5f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
-        // Bottom Face
-        glNormal3f( 0.0f,-0.5f, 0.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
-        // Right Face
-        glNormal3f( 0.5f, 0.0f, 0.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
-        // Left Face
-        glNormal3f(-0.5f, 0.0f, 0.0f);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
-    glEnd();
-}
+GLfloat angle, scale = 5.0;
 
 void display()
 {
-    const GLfloat scale = 10.0;
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
     glTranslatef(0.0, -1.0, -6.0);
     glRotatef(angle, 0.0, 1.0, 0.0);
-
     glScalef(scale, scale, scale);
 
-    glColor3f(1.0, 1.0, 1.0);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(4, GL_FLOAT, sizeof(GLfloat) * fish.getStride(), fish.getBuffer());
     glDrawArrays(GL_TRIANGLES, 0, fish.getCount());
@@ -149,34 +103,44 @@ void keyboard(unsigned char key, int x, int y)
                     glEnable(GL_LIGHTING);
                 else
                     glDisable(GL_LIGHTING);
+
+                break;
             }
+
+        case 'g':
+            fish.loadObj(DATADIR "/goldenfish/goldenfish.obj");
+            scale = 0.012;
+            break;
+
+        case 'c':
+            fish.loadObj(DATADIR "/clownfish/clownfish.obj");
+            scale = 7.0;
+            break;
     }
 }
 
 void initGL()
 {
-    GLfloat mat_specular[] = {1.0, 1.0, 0.0, 1.0};
+    GLfloat mat_specular[] = {0.8, 0.8, 0.0, 1.0};
     GLfloat mat_shininess[] = {50.0};
 
-    GLfloat light_ambient[] = {0.2, 0.2, 0.0, 1.0};
+    GLfloat light_ambient[] = {0.5, 0.5, 0.0, 1.0};
     GLfloat light_diffuse[] = {0.5, 0.5, 0.0, 1.0};
-    GLfloat light_specular[] = {0.8, 0.8, 8.0, 1.0};
-    GLfloat light_position[] = {-1.0, 0.0, -6.0, 1.0};
+    GLfloat light_specular[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light_position[] = {10.0, 0.0, -5.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
     glShadeModel(GL_SMOOTH);
 
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-    glEnable(GL_COLOR_MATERIAL);
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.4);
-    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1);
+    //glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.5);
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -213,8 +177,7 @@ int main(int argc, char **argv)
 
     initGL();
 
-    fish.loadObj(DATADIR "/clownfish/clownfish.obj");
-    //fish.loadObj("goldenfish.obj");
+    keyboard('c', 0, 0);
 
     glutMainLoop();
 
