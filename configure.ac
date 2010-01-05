@@ -21,5 +21,6 @@ AC_PROG_CXX
 AC_CONFIG_FILES([Makefile
                  data/Makefile
                  data/clownfish/Makefile
+                 data/goldenfish/Makefile
                  src/Makefile])
 AC_OUTPUT

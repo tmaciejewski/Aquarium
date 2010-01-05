@@ -1,1 +1,1 @@
-SUBDIRS = clownfish
+SUBDIRS = clownfish goldenfish

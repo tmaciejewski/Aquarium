@@ -1,0 +1,24 @@
+# Blender3D MTL File: 
+# Material Count: 2
+newmtl material1ID_texture1.jpg
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.330000 0.330000 0.330000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd texture1.jpg
+
+
+newmtl material0ID_texture0.jpg
+Ns 154.901961
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.330000 0.330000 0.330000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd texture0.jpg
+
+
