@@ -48,6 +48,36 @@ void Model::clear()
     count = 0;
 }
 
+void Model::updateBoundBox(GLfloat v[])
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        if (v[i] > max[i])
+            max[i] = v[i];
+
+        if (v[i] < min[i])
+            min[i] = v[i];
+    }
+
+    for (int i = 0; i < 8; ++i)
+    {
+        if (i == 0 || i == 3 || i == 4 || i == 7)
+            boundingBox[3 * i + 0] = max[0];
+        else
+            boundingBox[3 * i + 0] = min[0];
+
+        if (i <= 3)
+            boundingBox[3 * i + 1] = max[1];
+        else
+            boundingBox[3 * i + 1] = min[1];
+
+        if (i == 0 || i == 1 || i == 4 || i == 5)
+            boundingBox[3 * i + 2] = max[2];
+        else
+            boundingBox[3 * i + 2] = min[2];
+    }
+}
+
 void Model::loadObj(const char *filename, GLfloat w)
 {
     std::ifstream file(filename);
@@ -104,6 +134,8 @@ void Model::loadObj(const char *filename, GLfloat w)
                     t[0] = vt_tmp[2 * ti];
                     t[1] = vt_tmp[2 * ti + 1];
 
+                    updateBoundBox(v);
+
                     buf.push_back(v[0]);
                     buf.push_back(v[1]);
                     buf.push_back(v[2]);
@@ -122,8 +154,13 @@ void Model::loadObj(const char *filename, GLfloat w)
         }
     }
 
-    stride = buf.size() / count;
+    if (count > 0)
+    {
+        stride = buf.size() / count;
 
-    buffer = new GLfloat[buf.size()];
-    std::copy(buf.begin(), buf.end(), buffer);
+        buffer = new GLfloat[buf.size()];
+        std::copy(buf.begin(), buf.end(), buffer);
+
+
+    }
 }

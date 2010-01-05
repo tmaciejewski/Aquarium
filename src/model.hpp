@@ -34,16 +34,18 @@ class Model
         void loadObj(const char *name, GLfloat w = 1.0);
 
         const GLfloat *getBuffer() { return buffer; }
+        const GLfloat *getBoundingBox() { return boundingBox; }
         unsigned getCount() { return count; }
         unsigned getStride() { return stride; }
 
     private:
-        GLfloat *buffer;
+        GLfloat *buffer, boundingBox[24];
         GLfloat min[3], max[3], weight;
         size_t count;
         unsigned stride;
 
         void clear();
+        void updateBoundBox(GLfloat v[]);
 
 };
 
