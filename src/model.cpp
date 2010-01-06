@@ -37,8 +37,13 @@ Model::~Model()
 
 void Model::clear()
 {
+    for (std::vector<Buffer>::iterator it = buffer.begin();
+        it != buffer.end(); ++it)
+    {
+        delete[] it->vertices;
+    }
+
     buffer.clear();
-    buffer.push_back(Buffer());
 
     min[0] = min[1] = min[2] = 0.0;
     max[0] = max[1] = max[2] = 0.0;
@@ -76,6 +81,21 @@ void Model::updateBoundBox(GLfloat v[])
     }
 }
 
+void Model::addBuffer(const std::vector<GLfloat> &buf,
+                        const size_t count, std::string mtl)
+{
+    if (count > 0)
+    {
+        Buffer b;
+        b.material = mtl;
+        b.count = count;
+        b.stride = buf.size() / b.count;
+        b.vertices = new GLfloat[buf.size()];
+        std::copy(buf.begin(), buf.end(), b.vertices);
+        buffer.push_back(b);
+    }
+}
+
 void Model::loadObj(const char *name, GLfloat w)
 {
     modelName = name;
@@ -83,7 +103,7 @@ void Model::loadObj(const char *name, GLfloat w)
     std::string filename = modelPath + std::string("/") + name + std::string(".obj");
     std::ifstream file(filename.c_str());
     std::vector<GLfloat> v_tmp, vt_tmp, buf;
-    std::string line;
+    std::string line, mtl;
     size_t count = 0;
 
     clear();
@@ -154,6 +174,20 @@ void Model::loadObj(const char *name, GLfloat w)
                 s >> mtllib;
                 loadMaterialLibrary(mtllib.c_str());
             }
+            else if (command == "usemtl")
+            {
+                std::cout << "Using material: " << mtl << " and adding buf"
+                        " with " << count << " vertices\n";
+
+                if (count > 0)
+                {
+                    addBuffer(buf, count, mtl);
+                    buf.clear();
+                    count = 0;
+                }
+
+                s >> mtl;
+            }
             else
             {
                 std::cout << '\'' << command << "' not implemented\n";
@@ -161,15 +195,7 @@ void Model::loadObj(const char *name, GLfloat w)
         }
     }
 
-    if (count > 0)
-    {
-        Buffer &b = buffer[0];
-
-        b.count = count;
-        b.stride = buf.size() / b.count;
-        b.vertices = new GLfloat[buf.size()];
-        std::copy(buf.begin(), buf.end(), b.vertices);
-    }
+    addBuffer(buf, count, mtl);
 }
 
 void Model::loadMaterialLibrary(const char *mtlfile)

@@ -49,9 +49,9 @@ class Model
             GLenum mode;
             GLfloat *vertices;
             size_t count, stride;
+            std::string material;
 
             Buffer() : vertices(NULL), mode(GL_TRIANGLES) {}
-            ~Buffer() { if (vertices) delete[] vertices; }
         };
 
         std::vector<Buffer> buffer;
@@ -64,6 +64,8 @@ class Model
         void clear();
         void updateBoundBox(GLfloat v[]);
         void loadMaterialLibrary(const char *mtlfile);
+        void addBuffer(const std::vector<GLfloat> &buf,
+            const size_t count, std::string mtl);
 
 };
 
