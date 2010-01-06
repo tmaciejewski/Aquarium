@@ -150,7 +150,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\" -DGL_GLEXT_PROTOTYPES
-aqua_LDADD = -lglut
+aqua_LDADD = -lSDL -lSDL_image -lGL -lGLU
 aqua_SOURCES = aqua.cpp model.hpp model.cpp
 all: all-am
 

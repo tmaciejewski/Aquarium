@@ -19,7 +19,11 @@
 
 #include <unistd.h>
 #include <cstdlib>
-#include <GL/glut.h>
+#include <iostream>
+#include <GL/glu.h>
+#include <GL/gl.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 #include "model.hpp"
 
 #include "../config.h"
@@ -27,79 +31,71 @@
 Model fish;
 unsigned width = 640, height = 480;
 GLfloat angle;
+GLuint waterTex;
+std::vector<bool> keyPressed(SDLK_LAST);
+SDL_Surface *surface;
+
+SDL_Surface * setVideoMode()
+{
+    SDL_Surface *surface;
+    int flags = SDL_OPENGL | SDL_RESIZABLE;
+    if ((surface = SDL_SetVideoMode(width, height, 0, flags)) == NULL)
+    {
+        std::cerr << "Unable to create OpenGL screen: " << SDL_GetError() << '\n';
+        SDL_Quit();
+        exit(-1);
+    }
+
+    return surface;
+}
+
+void setWaterTexture()
+{
+    SDL_Surface *water = IMG_Load(DATADIR "/water.jpg");
+    if (water)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, water->w,
+                    water->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                    water->pixels);
+        SDL_FreeSurface(water);
+    }
+}
 
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glTranslatef(0.0, 0.0, -1.1);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D, waterTex);
+    glBegin(GL_QUADS);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, 1.0, 0.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
+    glTexCoord2f(0.0, 1.0); glVertex3f(1.0, -1.0, 0.0);
+    glEnd();
+    glEnable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glLoadIdentity();
     glTranslatef(0.0, -1.0, -6.0);
     glRotatef(angle, 0.0, 1.0, 0.0);
 
     fish.display();
 
-    glutSwapBuffers();
-}
-
-void idle()
-{
-    angle += 1.0;
-
-    if (angle > 360)
-        angle -= 360;
-
-    display();
-
-    usleep(20000);
-}
-
-void keyboard(unsigned char key, int x, int y)
-{
-    switch (key)
-    {
-        case 27:  // The escape key
-        case 'Q':
-        case 'q':
-            exit(0);   // Simply exit
-            break;
-
-        case '1':
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            break;
-
-        case '2':
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            break;
-
-        case 'l':
-            {
-                GLboolean lighting;
-
-                glGetBooleanv(GL_LIGHTING, &lighting);
-
-                if (!lighting)
-                    glEnable(GL_LIGHTING);
-                else
-                    glDisable(GL_LIGHTING);
-
-                break;
-            }
-
-        case 'g':
-            fish.loadObj("goldenfish", 0.012);
-            break;
-
-        case 'c':
-            fish.loadObj("clownfish", 7.0);
-            break;
-    }
+    SDL_GL_SwapBuffers();
 }
 
 void initGL()
 {
-    GLfloat light_ambient[] = {0.2, 0.2, 0.2, 1.0};
-    GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
-    GLfloat light_specular[] = {0.9, 0.9, 0.9, 1.0};
+    GLfloat light_ambient[] = {0.3, 0.3, 0.0, 1.0};
+    GLfloat light_diffuse[] = {0.5, 0.5, 0.0, 1.0};
+    GLfloat light_specular[] = {0.9, 0.9, 0.0, 1.0};
     GLfloat light_position[] = {-1.0, 0.0, -6.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
@@ -119,6 +115,21 @@ void initGL()
     glDepthFunc(GL_LESS);
 
     glDisable(GL_CULL_FACE);
+
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    glEnable(GL_TEXTURE_2D);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    glGenTextures(1, &waterTex);
+    glBindTexture(GL_TEXTURE_2D, waterTex);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    setWaterTexture();
 }
 
 void resize(int w, int h)
@@ -133,23 +144,103 @@ void resize(int w, int h)
     glLoadIdentity();
 }
 
+void update()
+{
+    if(keyPressed['1'])
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+    if(keyPressed['2'])
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    if(keyPressed['l'])
+    {
+        GLboolean lighting;
+
+        glGetBooleanv(GL_LIGHTING, &lighting);
+
+        if (!lighting)
+            glEnable(GL_LIGHTING);
+        else
+            glDisable(GL_LIGHTING);
+
+        keyPressed['l'] = false;
+    }
+
+    if(keyPressed['g'])
+    {
+        fish.loadObj("goldenfish", 0.012);
+        keyPressed['g'] = false;
+    }
+
+    if (keyPressed['c'])
+    {
+            fish.loadObj("clownfish", 7.0);
+            keyPressed['c'] = false;
+    }
+
+    angle += 1.0;
+
+    if (angle > 360)
+        angle -= 360;
+}
+
+void run()
+{
+    SDL_Event event = {0};
+
+    while (!keyPressed[SDLK_ESCAPE] && event.type != SDL_QUIT)
+    {
+        update();
+        display();
+
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
+            {
+                keyPressed[event.key.keysym.sym] = static_cast<bool>(event.key.state);
+            }
+
+            if (event.type == SDL_VIDEORESIZE)
+            {
+                width = event.resize.w;
+                height = event.resize.h;
+
+                if (surface)
+                    SDL_FreeSurface(surface);
+
+                surface = setVideoMode();
+                resize(width, height);
+            }
+        }
+
+        usleep(20000);
+    }
+}
+
 int main(int argc, char **argv)
 {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(width, height);
-    glutCreateWindow(PACKAGE_STRING);
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        std::cerr << "Unable to initialize SDL: " << SDL_GetError() << '\n';
+        return -1;
+    }
 
-    glutDisplayFunc(display);
-    glutReshapeFunc(resize);
-    glutIdleFunc(idle);
-    glutKeyboardFunc(keyboard);
+    IMG_Init(IMG_INIT_JPG);
+
+    surface = setVideoMode();
+
+    SDL_WM_SetCaption(PACKAGE_STRING, NULL);
 
     initGL();
+    resize(640, 480);
 
-    keyboard('c', 0, 0);
+    fish.loadObj("clownfish", 7.0);
 
-    glutMainLoop();
+    run();
+
+    IMG_Quit();
+    SDL_Quit();
 
     return EXIT_SUCCESS;
 }
