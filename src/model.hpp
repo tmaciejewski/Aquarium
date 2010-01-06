@@ -22,6 +22,9 @@
 #define MODEL_H
 
 #include <fstream>
+#include <map>
+#include <memory>
+#include <vector>
 #include <GL/gl.h>
 #include <GL/glext.h>
 
@@ -32,20 +35,35 @@ class Model
         virtual ~Model();
 
         void loadObj(const char *name, GLfloat w = 1.0);
-
-        const GLfloat *getBuffer() { return buffer; }
-        const GLfloat *getBoundingBox() { return boundingBox; }
-        unsigned getCount() { return count; }
-        unsigned getStride() { return stride; }
+        void display();
 
     private:
-        GLfloat *buffer, boundingBox[24];
+
+        struct Material
+        {
+            GLfloat color_ambient[3], color_diffuse[3], color_specular[3];
+        };
+
+        struct Buffer
+        {
+            GLenum mode;
+            GLfloat *vertices;
+            size_t count, stride;
+
+            Buffer() : vertices(NULL), mode(GL_TRIANGLES) {}
+            ~Buffer() { if (vertices) delete[] vertices; }
+        };
+
+        std::vector<Buffer> buffer;
+        GLfloat boundingBox[24];
         GLfloat min[3], max[3], weight;
-        size_t count;
-        unsigned stride;
+
+        std::string modelName, modelPath;
+        std::map<std::string, Material> material;
 
         void clear();
         void updateBoundBox(GLfloat v[]);
+        void loadMaterialLibrary(const char *mtlfile);
 
 };
 

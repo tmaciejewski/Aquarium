@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-Model::Model() : buffer(NULL)
+Model::Model()
 {
     clear();
 }
@@ -37,15 +37,13 @@ Model::~Model()
 
 void Model::clear()
 {
-    if (buffer)
-        delete[] buffer;
+    buffer.clear();
+    buffer.push_back(Buffer());
 
     min[0] = min[1] = min[2] = 0.0;
     max[0] = max[1] = max[2] = 0.0;
 
     weight = 1.0;
-
-    count = 0;
 }
 
 void Model::updateBoundBox(GLfloat v[])
@@ -78,11 +76,15 @@ void Model::updateBoundBox(GLfloat v[])
     }
 }
 
-void Model::loadObj(const char *filename, GLfloat w)
+void Model::loadObj(const char *name, GLfloat w)
 {
-    std::ifstream file(filename);
+    modelName = name;
+    modelPath = std::string(DATADIR "/") + modelName;
+    std::string filename = modelPath + std::string("/") + name + std::string(".obj");
+    std::ifstream file(filename.c_str());
     std::vector<GLfloat> v_tmp, vt_tmp, buf;
     std::string line;
+    size_t count = 0;
 
     clear();
     weight = w;
@@ -139,13 +141,18 @@ void Model::loadObj(const char *filename, GLfloat w)
                     buf.push_back(v[0]);
                     buf.push_back(v[1]);
                     buf.push_back(v[2]);
-                    buf.push_back(weight);
 
                     buf.push_back(t[0]);
                     buf.push_back(t[1]);
 
                     ++count;
                 }
+            }
+            else if (command == "mtllib")
+            {
+                std::string mtllib;
+                s >> mtllib;
+                loadMaterialLibrary(mtllib.c_str());
             }
             else
             {
@@ -156,11 +163,97 @@ void Model::loadObj(const char *filename, GLfloat w)
 
     if (count > 0)
     {
-        stride = buf.size() / count;
+        Buffer &b = buffer[0];
 
-        buffer = new GLfloat[buf.size()];
-        std::copy(buf.begin(), buf.end(), buffer);
-
-
+        b.count = count;
+        b.stride = buf.size() / b.count;
+        b.vertices = new GLfloat[buf.size()];
+        std::copy(buf.begin(), buf.end(), b.vertices);
     }
+}
+
+void Model::loadMaterialLibrary(const char *mtlfile)
+{
+    std::string filename = modelPath + std::string("/") + mtlfile;
+    std::ifstream file(filename.c_str());
+
+    std::cout << "Loading material library: " << filename << '\n';
+
+    std::string line;
+    std::string mtlname;
+
+    while(getline(file, line))
+    {
+        if (line.size() > 0 && line[0] != '#')
+        {
+            std::string command;
+            std::istringstream s(line);
+            s >> command;
+
+            if (command == "newmtl")
+            {
+                s >> mtlname;
+                material[mtlname] = Material();
+            }
+            else if (command == "Ka")
+            {
+                Material &mtl = material[mtlname];
+                s >> mtl.color_ambient[0] >> mtl.color_ambient[1]
+                    >> mtl.color_ambient[2];
+            }
+            else if (command == "Kd")
+            {
+                Material &mtl = material[mtlname];
+                s >> mtl.color_diffuse[0] >> mtl.color_diffuse[1]
+                    >> mtl.color_diffuse[2];
+            }
+            else if (command == "Ks")
+            {
+                Material &mtl = material[mtlname];
+                s >> mtl.color_specular[0] >> mtl.color_specular[1]
+                    >> mtl.color_specular[2];
+            }
+            else
+            {
+                std::cout << "Material command " << command
+                    << " not implemented\n";
+            }
+        }
+    }
+}
+
+void Model::display()
+{
+    glPushMatrix();
+
+    glScalef(weight, weight, weight);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    for (std::vector<Buffer>::iterator it = buffer.begin();
+        it != buffer.end(); ++it)
+    {
+        glVertexPointer(3, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices);
+        glDrawArrays(it->mode, 0, it->count);
+    }
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    GLint mode[2];
+    glGetIntegerv(GL_POLYGON_MODE, mode);
+
+    if (mode[0] == GL_LINE)
+    {
+        static GLubyte indices[] = {0, 1, 2, 3,
+                                      4, 5, 1, 0,
+                                      5, 6, 2, 1,
+                                      6, 7, 3, 2,
+                                      7, 4, 0, 3,
+                                      5, 4, 7, 6};
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0,  boundingBox);
+        glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+
+    glPopMatrix();
 }

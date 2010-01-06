@@ -26,7 +26,7 @@
 
 Model fish;
 unsigned width = 640, height = 480;
-GLfloat angle, scale = 5.0;
+GLfloat angle;
 
 void display()
 {
@@ -35,30 +35,8 @@ void display()
 
     glTranslatef(0.0, -1.0, -6.0);
     glRotatef(angle, 0.0, 1.0, 0.0);
-    glScalef(scale, scale, scale);
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(4, GL_FLOAT, sizeof(GLfloat) * fish.getStride(), fish.getBuffer());
-    glDrawArrays(GL_TRIANGLES, 0, fish.getCount());
-    glDisableClientState(GL_VERTEX_ARRAY);
-
-    GLint mode[2];
-    glGetIntegerv(GL_POLYGON_MODE, mode);
-
-    if (mode[0] == GL_LINE)
-    {
-        static GLubyte indices[] = {0, 1, 2, 3,
-                                      4, 5, 1, 0,
-                                      5, 6, 2, 1,
-                                      6, 7, 3, 2,
-                                      7, 4, 0, 3,
-                                      5, 4, 7, 6};
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, fish.getBoundingBox());
-        glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
+    fish.display();
 
     glutSwapBuffers();
 }
@@ -108,13 +86,11 @@ void keyboard(unsigned char key, int x, int y)
             }
 
         case 'g':
-            fish.loadObj(DATADIR "/goldenfish/goldenfish.obj");
-            scale = 0.012;
+            fish.loadObj("goldenfish", 0.012);
             break;
 
         case 'c':
-            fish.loadObj(DATADIR "/clownfish/clownfish.obj");
-            scale = 7.0;
+            fish.loadObj("clownfish", 7.0);
             break;
     }
 }
