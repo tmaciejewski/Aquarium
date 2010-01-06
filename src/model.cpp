@@ -259,6 +259,7 @@ void Model::display()
         it != buffer.end(); ++it)
     {
         glVertexPointer(3, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices);
+        useMaterial(it->material);
         glDrawArrays(it->mode, 0, it->count);
     }
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -282,4 +283,19 @@ void Model::display()
     }
 
     glPopMatrix();
+}
+
+void Model::useMaterial(const std::string &mtl)
+{
+    try
+    {
+        Material &m = material[mtl];
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m.color_ambient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m.color_diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m.color_specular);
+    }
+    catch(...)
+    {
+        std::cout << "Cannot set material " << mtl << '\n';
+    }
 }

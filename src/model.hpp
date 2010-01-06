@@ -66,6 +66,7 @@ class Model
         void loadMaterialLibrary(const char *mtlfile);
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);
+        void useMaterial(const std::string &mtl);
 
 };
 
