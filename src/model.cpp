@@ -44,6 +44,7 @@ void Model::clear()
     }
 
     buffer.clear();
+    material.clear();
 
     min[0] = min[1] = min[2] = 0.0;
     max[0] = max[1] = max[2] = 0.0;
