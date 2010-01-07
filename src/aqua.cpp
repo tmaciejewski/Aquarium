@@ -34,6 +34,7 @@ GLfloat angle;
 GLuint waterTex;
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
+bool lighting;
 
 SDL_Surface * setVideoMode()
 {
@@ -67,9 +68,7 @@ void display()
     glLoadIdentity();
 
     glDisable(GL_LIGHTING);
-    glEnable(GL_TEXTURE_2D);
     glTranslatef(0.0, 0.0, -1.1);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glBindTexture(GL_TEXTURE_2D, waterTex);
     glBegin(GL_QUADS);
     glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
@@ -77,14 +76,15 @@ void display()
     glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(1.0, -1.0, 0.0);
     glEnd();
-    glEnable(GL_LIGHTING);
-    glDisable(GL_TEXTURE_2D);
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
     glTranslatef(0.0, -1.0, -6.0);
     glRotatef(angle, 0.0, 1.0, 0.0);
+
+    if (lighting)
+        glEnable(GL_LIGHTING);
 
     fish.display();
 
@@ -93,9 +93,9 @@ void display()
 
 void initGL()
 {
-    GLfloat light_ambient[] = {0.3, 0.3, 0.0, 1.0};
-    GLfloat light_diffuse[] = {0.5, 0.5, 0.0, 1.0};
-    GLfloat light_specular[] = {0.9, 0.9, 0.0, 1.0};
+    GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1.0};
+    GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
+    GLfloat light_specular[] = {0.9, 0.9, 0.9, 1.0};
     GLfloat light_position[] = {-1.0, 0.0, -6.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
@@ -108,7 +108,6 @@ void initGL()
 
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.5);
 
-    glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
     glEnable(GL_DEPTH_TEST);
@@ -149,21 +148,12 @@ void update()
     if(keyPressed['1'])
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-
     if(keyPressed['2'])
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     if(keyPressed['l'])
     {
-        GLboolean lighting;
-
-        glGetBooleanv(GL_LIGHTING, &lighting);
-
-        if (!lighting)
-            glEnable(GL_LIGHTING);
-        else
-            glDisable(GL_LIGHTING);
-
+        lighting = !lighting;
         keyPressed['l'] = false;
     }
 

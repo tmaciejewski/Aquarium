@@ -22,11 +22,13 @@
 #define MODEL_H
 
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <vector>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <SDL/SDL_image.h>
 
 class Model
 {
@@ -42,6 +44,36 @@ class Model
         struct Material
         {
             GLfloat color_ambient[3], color_diffuse[3], color_specular[3];
+            GLuint texture;
+
+            Material()
+            {
+                glGenTextures(1, &texture);
+                glBindTexture(GL_TEXTURE_2D, texture);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                               GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                               GL_NEAREST);
+            }
+
+            void clear() { glDeleteTextures(1, &texture); }
+
+            void loadTexture(const std::string &texname)
+            {
+                std::string filename = std::string(DATADIR"/") + texname;
+                std::cout << "Loading texture: " << filename << '\n';
+                SDL_Surface *img = IMG_Load(filename.c_str());
+                glBindTexture(GL_TEXTURE_2D, texture);
+                if (img)
+                {
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w,
+                                img->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                                img->pixels);
+                    SDL_FreeSurface(img);
+                }
+            }
         };
 
         struct Buffer
@@ -52,6 +84,7 @@ class Model
             std::string material;
 
             Buffer() : vertices(NULL), mode(GL_TRIANGLES) {}
+            void clear() { if (vertices) delete[] vertices; }
         };
 
         std::vector<Buffer> buffer;

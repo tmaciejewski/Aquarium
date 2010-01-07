@@ -19,7 +19,6 @@
 
 
 #include "model.hpp"
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -40,10 +39,17 @@ void Model::clear()
     for (std::vector<Buffer>::iterator it = buffer.begin();
         it != buffer.end(); ++it)
     {
-        delete[] it->vertices;
+        it->clear();
     }
 
     buffer.clear();
+
+    for (std::map<std::string, Material>::iterator it = material.begin();
+        it != material.end(); ++it)
+    {
+        it->second.clear();
+    }
+
     material.clear();
 
     min[0] = min[1] = min[2] = 0.0;
@@ -177,9 +183,6 @@ void Model::loadObj(const char *name, GLfloat w)
             }
             else if (command == "usemtl")
             {
-                std::cout << "Using material: " << mtl << " and adding buf"
-                        " with " << count << " vertices\n";
-
                 if (count > 0)
                 {
                     addBuffer(buf, count, mtl);
@@ -240,6 +243,13 @@ void Model::loadMaterialLibrary(const char *mtlfile)
                 s >> mtl.color_specular[0] >> mtl.color_specular[1]
                     >> mtl.color_specular[2];
             }
+            else if (command == "map_Kd")
+            {
+                std::string texname;
+                s >> texname;
+                Material &mtl = material[mtlname];
+                mtl.loadTexture(modelName + "/" + texname);
+            }
             else
             {
                 std::cout << "Material command " << command
@@ -256,18 +266,21 @@ void Model::display()
     glScalef(weight, weight, weight);
 
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     for (std::vector<Buffer>::iterator it = buffer.begin();
         it != buffer.end(); ++it)
     {
         glVertexPointer(3, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices + 3);
         useMaterial(it->material);
         glDrawArrays(it->mode, 0, it->count);
     }
     glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     GLint mode[2];
     glGetIntegerv(GL_POLYGON_MODE, mode);
-
+    glBindTexture(GL_TEXTURE_2D, 0);
     if (mode[0] == GL_LINE)
     {
         static GLubyte indices[] = {0, 1, 2, 3,
@@ -294,6 +307,7 @@ void Model::useMaterial(const std::string &mtl)
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m.color_ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m.color_diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m.color_specular);
+        glBindTexture(GL_TEXTURE_2D, m.texture);
     }
     catch(...)
     {
