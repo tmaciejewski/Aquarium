@@ -11,3 +11,4 @@ config.h
 Makefile
 *.cache
 .deps
+src/*.obj

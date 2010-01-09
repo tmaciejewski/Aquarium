@@ -36,44 +36,15 @@ class Model
         Model();
         virtual ~Model();
 
-        void loadObj(const char *name, GLfloat w = 1.0);
-        void display();
+        void loadObj(const char *path, const char *name);
+        void display(const GLfloat scale = 1.0);
 
     private:
 
         struct Material
         {
             GLfloat color_ambient[3], color_diffuse[3], color_specular[3];
-            GLuint texture;
-
-            Material()
-            {
-                glGenTextures(1, &texture);
-                glBindTexture(GL_TEXTURE_2D, texture);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                               GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                               GL_NEAREST);
-            }
-
-            void clear() { glDeleteTextures(1, &texture); }
-
-            void loadTexture(const std::string &texname)
-            {
-                std::string filename = std::string(DATADIR"/") + texname;
-                std::cout << "Loading texture: " << filename << '\n';
-                SDL_Surface *img = IMG_Load(filename.c_str());
-                glBindTexture(GL_TEXTURE_2D, texture);
-                if (img)
-                {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w,
-                                img->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                                img->pixels);
-                    SDL_FreeSurface(img);
-                }
-            }
+            std::string texture;
         };
 
         struct Buffer
@@ -89,14 +60,16 @@ class Model
 
         std::vector<Buffer> buffer;
         GLfloat boundingBox[24];
-        GLfloat min[3], max[3], weight;
+        GLfloat min[3], max[3];
 
-        std::string modelName, modelPath;
+        std::string modelPath;
         std::map<std::string, Material> material;
+        std::map<std::string, GLuint> texture;
 
         void clear();
         void updateBoundBox(GLfloat v[]);
         void loadMaterialLibrary(const char *mtlfile);
+        void loadTexture(const std::string &texname);
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);
         void useMaterial(const std::string &mtl);

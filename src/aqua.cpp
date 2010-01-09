@@ -24,17 +24,18 @@
 #include <GL/gl.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include "model.hpp"
+#include "modellib.hpp"
 
 #include "../config.h"
 
-Model fish;
+ModelLib modelLib;
 unsigned width = 640, height = 480;
-GLfloat angle;
+GLfloat angle, scale = 7.0;
 GLuint waterTex;
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
 bool lighting;
+std::string model = "clownfish";
 
 SDL_Surface * setVideoMode()
 {
@@ -80,13 +81,13 @@ void display()
     glClear(GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    glTranslatef(0.0, -1.0, -6.0);
+    glTranslatef(0.0, -1.0, -5.0);
     glRotatef(angle, 0.0, 1.0, 0.0);
 
     if (lighting)
         glEnable(GL_LIGHTING);
 
-    fish.display();
+    modelLib.display(model, scale);
 
     SDL_GL_SwapBuffers();
 }
@@ -159,14 +160,23 @@ void update()
 
     if(keyPressed['g'])
     {
-        fish.loadObj("goldenfish", 0.012);
+        model = "goldenfish";
+        scale = 0.01;
         keyPressed['g'] = false;
     }
 
     if (keyPressed['c'])
     {
-            fish.loadObj("clownfish", 7.0);
-            keyPressed['c'] = false;
+        model = "clownfish";
+        scale = 7.0;
+        keyPressed['c'] = false;
+    }
+
+    if (keyPressed['b'])
+    {
+        model = "ladybug";
+        scale = 0.005;
+        keyPressed['b'] = false;
     }
 
     angle += 1.0;
@@ -225,7 +235,8 @@ int main(int argc, char **argv)
     initGL();
     resize(640, 480);
 
-    fish.loadObj("clownfish", 7.0);
+    modelLib.loadLib(DATADIR);
+    modelLib.loadLib(".");
 
     run();
 

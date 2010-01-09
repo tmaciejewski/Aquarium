@@ -25,7 +25,7 @@
 
 Model::Model()
 {
-    clear();
+
 }
 
 
@@ -44,18 +44,17 @@ void Model::clear()
 
     buffer.clear();
 
-    for (std::map<std::string, Material>::iterator it = material.begin();
-        it != material.end(); ++it)
+    for (std::map<std::string, GLuint>::iterator it = texture.begin();
+        it != texture.end(); ++it)
     {
-        it->second.clear();
+        glDeleteTextures(1, &it->second);
     }
 
     material.clear();
+    texture.clear();
 
     min[0] = min[1] = min[2] = 0.0;
     max[0] = max[1] = max[2] = 0.0;
-
-    weight = 1.0;
 }
 
 void Model::updateBoundBox(GLfloat v[])
@@ -103,18 +102,16 @@ void Model::addBuffer(const std::vector<GLfloat> &buf,
     }
 }
 
-void Model::loadObj(const char *name, GLfloat w)
+void Model::loadObj(const char *path, const char *name)
 {
-    modelName = name;
-    modelPath = std::string(DATADIR "/") + modelName;
-    std::string filename = modelPath + std::string("/") + name + std::string(".obj");
+    modelPath = path;
+    std::string filename = modelPath + "/" + std::string(name) + ".obj";
     std::ifstream file(filename.c_str());
     std::vector<GLfloat> v_tmp, vt_tmp, buf;
     std::string line, mtl;
     size_t count = 0;
 
     clear();
-    weight = w;
 
     std::cout << "Loading model from: " << filename << '\n';
 
@@ -245,10 +242,9 @@ void Model::loadMaterialLibrary(const char *mtlfile)
             }
             else if (command == "map_Kd")
             {
-                std::string texname;
-                s >> texname;
                 Material &mtl = material[mtlname];
-                mtl.loadTexture(modelName + "/" + texname);
+                s >> mtl.texture;
+                loadTexture(mtl.texture);
             }
             else
             {
@@ -259,11 +255,11 @@ void Model::loadMaterialLibrary(const char *mtlfile)
     }
 }
 
-void Model::display()
+void Model::display(const GLfloat scale)
 {
     glPushMatrix();
 
-    glScalef(weight, weight, weight);
+    glScalef(scale, scale, scale);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -307,10 +303,37 @@ void Model::useMaterial(const std::string &mtl)
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m.color_ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m.color_diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m.color_specular);
-        glBindTexture(GL_TEXTURE_2D, m.texture);
+        glBindTexture(GL_TEXTURE_2D, texture[m.texture]);
     }
     catch(...)
     {
         std::cout << "Cannot set material " << mtl << '\n';
+    }
+}
+
+void Model::loadTexture(const std::string &texname)
+{
+    if (texture.find(texname) == texture.end())
+    {
+        std::string filename = modelPath + "/" + texname;
+        std::cout << "Loading texture " << texname << " from " << filename << '\n';
+        SDL_Surface *img = IMG_Load(filename.c_str());
+
+        if (img)
+        {
+            GLuint t;
+            glGenTextures(1, &t);
+            texture[texname] = t;
+            glBindTexture(GL_TEXTURE_2D, texture[texname]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w,
+                        img->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                        img->pixels);
+            SDL_FreeSurface(img);
+        }
     }
 }
