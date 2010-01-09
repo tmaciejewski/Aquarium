@@ -53,7 +53,6 @@ void ModelLib::loadLib(const char *p)
             Model *m = new Model();
             std::string modelPath = it->path().parent_path().directory_string();
             std::string modelName = it->path().stem();
-            std::cout << "Found model: " << modelName << '\n';
             m->loadObj(modelPath.c_str(), modelName.c_str());
             model[modelName] = m;
         }

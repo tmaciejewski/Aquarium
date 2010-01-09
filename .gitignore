@@ -11,5 +11,4 @@ config.h
 Makefile
 *.cache
 .deps
-src/*.obj
-bed1
+src/models
