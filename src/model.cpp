@@ -360,7 +360,7 @@ void Model::display(const GLfloat scale)
 
 void Model::useMaterial(const std::string &mtl)
 {
-    try
+    if (material.find(mtl) != material.end())
     {
         Material &m = material[mtl];
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m.color_ambient);
@@ -368,9 +368,15 @@ void Model::useMaterial(const std::string &mtl)
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m.color_specular);
         glBindTexture(GL_TEXTURE_2D, texture[m.texture]);
     }
-    catch(...)
+    else
     {
-        std::cout << "Cannot set material " << mtl << '\n';
+        // default material
+        GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
+        GLfloat mat_shininess[] = {50.0};
+
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
 
