@@ -107,7 +107,7 @@ void Model::loadObj(const char *path, const char *name)
     modelPath = path;
     std::string filename = modelPath + "/" + std::string(name) + ".obj";
     std::ifstream file(filename.c_str());
-    std::vector<GLfloat> v_tmp, vt_tmp, buf;
+    std::vector<GLfloat> tmp_buf[3], buf;
     std::string line, mtl;
     size_t count = 0;
 
@@ -127,20 +127,28 @@ void Model::loadObj(const char *path, const char *name)
             {
                 GLfloat x, y, z;
                 s >> x >> y >> z;
-                v_tmp.push_back(x);
-                v_tmp.push_back(y);
-                v_tmp.push_back(z);
+                tmp_buf[0].push_back(x);
+                tmp_buf[0].push_back(y);
+                tmp_buf[0].push_back(z);
+            }
+            else if (command == "vn")
+            {
+                GLfloat x, y, z;
+                s >> x >> y >> z;
+                tmp_buf[2].push_back(x);
+                tmp_buf[2].push_back(y);
+                tmp_buf[2].push_back(z);
             }
             else if (command == "vt")
             {
                 GLfloat u, v;
                 s >> u >> v;
-                vt_tmp.push_back(u);
-                vt_tmp.push_back(v);
+                tmp_buf[1].push_back(u);
+                tmp_buf[1].push_back(v);
             }
             else if (command == "f")
             {
-                count += addFace(buf, v_tmp, vt_tmp, s);
+                count += addFace(buf, tmp_buf, s);
             }
             else if (command == "mtllib")
             {
@@ -170,20 +178,31 @@ void Model::loadObj(const char *path, const char *name)
 }
 
 void Model::addVertex(std::vector<GLfloat> &buf,
-                     const std::vector<GLfloat> &v_tmp,
-                     const std::vector<GLfloat> &vt_tmp, unsigned *index)
+            const std::vector<GLfloat> *tmp_buf, unsigned *index)
 {
-    GLfloat v[3], t[2];
-    unsigned vi = index[0] - 1, ti = index[1] - 1;
+    GLfloat v[3], t[2] = {0}, n[3] = {0.0, 0.0, 1.0};
+    unsigned vi = index[0] - 1, ti, ni;
 
-    v[0] = v_tmp[3 * vi];
-    v[1] = v_tmp[3 * vi + 1];
-    v[2] = v_tmp[3 * vi + 2];
+    v[0] = tmp_buf[0][3 * vi];
+    v[1] = tmp_buf[0][3 * vi + 1];
+    v[2] = tmp_buf[0][3 * vi + 2];
 
     updateBoundBox(v);
 
-    t[0] = vt_tmp[2 * ti];
-    t[1] = vt_tmp[2 * ti + 1];
+    if (index[1] > 0)
+    {
+        ti = index[1] - 1;
+        t[0] = tmp_buf[1][2 * ti];
+        t[1] = tmp_buf[1][2 * ti + 1];
+    }
+
+    if (index[2] > 0)
+    {
+        ni = index[2] - 1;
+        n[0] = tmp_buf[2][3 * ni];
+        n[1] = tmp_buf[2][3 * ni + 1];
+        n[2] = tmp_buf[2][3 * ni + 2];
+    }
 
     buf.push_back(v[0]);
     buf.push_back(v[1]);
@@ -191,9 +210,13 @@ void Model::addVertex(std::vector<GLfloat> &buf,
 
     buf.push_back(t[0]);
     buf.push_back(t[1]);
+
+    buf.push_back(n[0]);
+    buf.push_back(n[1]);
+    buf.push_back(n[2]);
 }
 
-void Model::parseIndices(std::istream &s, unsigned *index, size_t n)
+unsigned Model::parseIndices(std::istream &s, unsigned *index, size_t n)
 {
     unsigned i = 0;
     std::string token;
@@ -203,30 +226,31 @@ void Model::parseIndices(std::istream &s, unsigned *index, size_t n)
         tokenStream >> index[i];
         ++i;
     } while (tokenStream.get() == '/' && i < n);
+
+    return i;
 }
 
 unsigned Model::addFace(std::vector<GLfloat> &buf,
-                     const std::vector<GLfloat> &v_tmp,
-                     const std::vector<GLfloat> &vt_tmp, std::istream &s)
+            const std::vector<GLfloat> *tmp_buf, std::istream &s)
 {
-    unsigned count = 0, firstVertex[2], lastVertex[2];
+    unsigned count = 0, firstVertex[3] = {0}, lastVertex[3] = {0};
 
     parseIndices(s, firstVertex);
     parseIndices(s, lastVertex);
 
     while(s)
     {
-        unsigned vertex[2];
+        unsigned vertex[3] = {0};
 
         parseIndices(s, vertex);
 
         if (s)
         {
-            addVertex(buf, v_tmp, vt_tmp, firstVertex);
-            addVertex(buf, v_tmp, vt_tmp, lastVertex);
-            addVertex(buf, v_tmp, vt_tmp, vertex);
+            addVertex(buf, tmp_buf, firstVertex);
+            addVertex(buf, tmp_buf, lastVertex);
+            addVertex(buf, tmp_buf, vertex);
 
-            std::copy(vertex, vertex + 2, lastVertex);
+            std::copy(vertex, vertex + 3, lastVertex);
 
             count += 3;
         }
@@ -299,16 +323,19 @@ void Model::display(const GLfloat scale)
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     for (std::vector<Buffer>::iterator it = buffer.begin();
         it != buffer.end(); ++it)
     {
         glVertexPointer(3, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices);
         glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices + 3);
+        glNormalPointer(GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices + 5);
         useMaterial(it->material);
         glDrawArrays(it->mode, 0, it->count);
     }
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
 
     GLint mode[2];
     glGetIntegerv(GL_POLYGON_MODE, mode);

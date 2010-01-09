@@ -34,7 +34,7 @@ GLfloat angle, scale = 7.0;
 GLuint waterTex;
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting;
+bool lighting = true;
 std::string model = "clownfish";
 
 SDL_Surface * setVideoMode()
@@ -97,7 +97,7 @@ void initGL()
     GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1.0};
     GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
     GLfloat light_specular[] = {0.9, 0.9, 0.9, 1.0};
-    GLfloat light_position[] = {0.0, -3.0, -6.0, 1.0};
+    GLfloat light_position[] = {0.0, 0.0, 0.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
     glShadeModel(GL_SMOOTH);

@@ -71,12 +71,10 @@ class Model
         void loadMaterialLibrary(const char *mtlfile);
         void loadTexture(const std::string &texname);
         void addVertex(std::vector<GLfloat> &buf,
-                const std::vector<GLfloat> &v_tmp,
-                const std::vector<GLfloat> &vt_tmp, unsigned *index);
+            const std::vector<GLfloat> *tmp_buf, unsigned *index);
         unsigned addFace(std::vector<GLfloat> &buf,
-            const std::vector<GLfloat> &v_tmp,
-            const std::vector<GLfloat> &vt_tmp, std::istream &s);
-        void parseIndices(std::istream &s, unsigned *index, size_t n = 2);
+            const std::vector<GLfloat> *tmp_buf, std::istream &s);
+        unsigned parseIndices(std::istream &s, unsigned *index, size_t n = 2);
         void verticesFromIndex(unsigned vi, unsigned ti, GLfloat *v, GLfloat *t);
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);
