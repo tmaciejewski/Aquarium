@@ -140,37 +140,7 @@ void Model::loadObj(const char *path, const char *name)
             }
             else if (command == "f")
             {
-                for (unsigned i = 0; i < 3; ++i)
-                {
-                    char c;
-                    unsigned vi, ti;
-                    GLfloat v[3], t[2];
-                    std::string str;
-
-                    s >> str;
-                    std::istringstream(str) >> vi >> c >> ti;
-
-                    --vi;
-                    --ti;
-
-                    v[0] = v_tmp[3 * vi];
-                    v[1] = v_tmp[3 * vi + 1];
-                    v[2] = v_tmp[3 * vi + 2];
-
-                    t[0] = vt_tmp[2 * ti];
-                    t[1] = vt_tmp[2 * ti + 1];
-
-                    updateBoundBox(v);
-
-                    buf.push_back(v[0]);
-                    buf.push_back(v[1]);
-                    buf.push_back(v[2]);
-
-                    buf.push_back(t[0]);
-                    buf.push_back(t[1]);
-
-                    ++count;
-                }
+                count += addFace(buf, v_tmp, vt_tmp, s);
             }
             else if (command == "mtllib")
             {
@@ -197,6 +167,72 @@ void Model::loadObj(const char *path, const char *name)
     }
 
     addBuffer(buf, count, mtl);
+}
+
+void Model::addVertex(std::vector<GLfloat> &buf,
+                     const std::vector<GLfloat> &v_tmp,
+                     const std::vector<GLfloat> &vt_tmp, unsigned *index)
+{
+    GLfloat v[3], t[2];
+    unsigned vi = index[0] - 1, ti = index[1] - 1;
+
+    v[0] = v_tmp[3 * vi];
+    v[1] = v_tmp[3 * vi + 1];
+    v[2] = v_tmp[3 * vi + 2];
+
+    updateBoundBox(v);
+
+    t[0] = vt_tmp[2 * ti];
+    t[1] = vt_tmp[2 * ti + 1];
+
+    buf.push_back(v[0]);
+    buf.push_back(v[1]);
+    buf.push_back(v[2]);
+
+    buf.push_back(t[0]);
+    buf.push_back(t[1]);
+}
+
+void Model::parseIndices(std::istream &s, unsigned *index, size_t n)
+{
+    unsigned i = 0;
+    std::string token;
+    s >> token;
+    std::istringstream tokenStream(token);
+    do {
+        tokenStream >> index[i];
+        ++i;
+    } while (tokenStream.get() == '/' && i < n);
+}
+
+unsigned Model::addFace(std::vector<GLfloat> &buf,
+                     const std::vector<GLfloat> &v_tmp,
+                     const std::vector<GLfloat> &vt_tmp, std::istream &s)
+{
+    unsigned count = 0, firstVertex[2], lastVertex[2];
+
+    parseIndices(s, firstVertex);
+    parseIndices(s, lastVertex);
+
+    while(s)
+    {
+        unsigned vertex[2];
+
+        parseIndices(s, vertex);
+
+        if (s)
+        {
+            addVertex(buf, v_tmp, vt_tmp, firstVertex);
+            addVertex(buf, v_tmp, vt_tmp, lastVertex);
+            addVertex(buf, v_tmp, vt_tmp, vertex);
+
+            std::copy(vertex, vertex + 2, lastVertex);
+
+            count += 3;
+        }
+    }
+
+    return count;
 }
 
 void Model::loadMaterialLibrary(const char *mtlfile)

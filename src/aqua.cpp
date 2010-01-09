@@ -97,7 +97,7 @@ void initGL()
     GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1.0};
     GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
     GLfloat light_specular[] = {0.9, 0.9, 0.9, 1.0};
-    GLfloat light_position[] = {-1.0, 0.0, -6.0, 1.0};
+    GLfloat light_position[] = {0.0, -3.0, -6.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
     glShadeModel(GL_SMOOTH);
@@ -237,6 +237,18 @@ int main(int argc, char **argv)
 
     modelLib.loadLib(DATADIR);
     modelLib.loadLib(".");
+
+    if (argc > 1)
+    {
+        model = argv[1];
+    }
+
+    if (argc > 2)
+    {
+        scale = atof(argv[2]);
+    }
+
+    std::cout << "Model is " << model << std::endl;
 
     run();
 

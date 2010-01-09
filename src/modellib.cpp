@@ -37,7 +37,8 @@ ModelLib::~ModelLib()
 
 void ModelLib::display(const std::string &modelName, GLfloat scale)
 {
-    model[modelName]->display(scale);
+    if (model.find(modelName) != model.end())
+        model[modelName]->display(scale);
 }
 
 void ModelLib::loadLib(const char *p)

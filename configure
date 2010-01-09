@@ -4337,6 +4337,12 @@ if test "x$ac_cv_header_SDL_SDL_image_h" = x""yes; then :
 fi
 
 
+ac_fn_c_check_header_mongrel "$LINENO" "boost/filesystem.hpp" "ac_cv_header_boost_filesystem_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_boost_filesystem_hpp" = x""yes; then :
+
+fi
+
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 

@@ -17,6 +17,7 @@ AC_CHECK_HEADER([GL/gl.h])
 AC_CHECK_HEADER([GL/glu.h])
 AC_CHECK_HEADER([SDL/sdl.h])
 AC_CHECK_HEADER([SDL/SDL_image.h])
+AC_CHECK_HEADER([boost/filesystem.hpp])
 
 # Checks for typedefs, structures, and compiler characteristics.
 
