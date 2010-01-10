@@ -203,6 +203,12 @@ void Model::addVertex(std::vector<GLfloat> &buf,
         n[1] = tmp_buf[2][3 * ni + 1];
         n[2] = tmp_buf[2][3 * ni + 2];
     }
+    else
+    {
+        n[0] = v[0];
+        n[1] = v[1];
+        n[2] = v[2];
+    }
 
     buf.push_back(v[0]);
     buf.push_back(v[1]);
@@ -280,36 +286,48 @@ void Model::loadMaterialLibrary(const char *mtlfile)
             if (command == "newmtl")
             {
                 s >> mtlname;
-                material[mtlname] = Material();
             }
-            else if (command == "Ka")
+            else if (mtlname != "")
             {
                 Material &mtl = material[mtlname];
-                s >> mtl.color_ambient[0] >> mtl.color_ambient[1]
-                    >> mtl.color_ambient[2];
-            }
-            else if (command == "Kd")
-            {
-                Material &mtl = material[mtlname];
-                s >> mtl.color_diffuse[0] >> mtl.color_diffuse[1]
-                    >> mtl.color_diffuse[2];
-            }
-            else if (command == "Ks")
-            {
-                Material &mtl = material[mtlname];
-                s >> mtl.color_specular[0] >> mtl.color_specular[1]
-                    >> mtl.color_specular[2];
-            }
-            else if (command == "map_Kd")
-            {
-                Material &mtl = material[mtlname];
-                s >> mtl.texture;
-                loadTexture(mtl.texture);
-            }
-            else
-            {
-                std::cout << "Material command " << command
-                    << " not implemented\n";
+
+                if (command == "Ka")
+                {
+                    s >> mtl.color_ambient[0] >> mtl.color_ambient[1]
+                        >> mtl.color_ambient[2];
+                }
+                else if (command == "Kd")
+                {
+                    s >> mtl.color_diffuse[0] >> mtl.color_diffuse[1]
+                        >> mtl.color_diffuse[2];
+                }
+                else if (command == "Ks")
+                {
+                    s >> mtl.color_specular[0] >> mtl.color_specular[1]
+                        >> mtl.color_specular[2];
+                }
+                else if (command == "Ns")
+                {
+                    s >> mtl.ns;
+                }
+                else if (command == "d")
+                {
+                    s >> mtl.d;
+                }
+                else if (command == "illum")
+                {
+                    s >> mtl.illum;
+                }
+                else if (command == "map_Kd")
+                {
+                    s >> mtl.texture;
+                    loadTexture(mtl.texture);
+                }
+                else
+                {
+                    std::cout << "Material command " << command
+                        << " not implemented\n";
+                }
             }
         }
     }
@@ -366,16 +384,21 @@ void Model::useMaterial(const std::string &mtl)
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m.color_ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m.color_diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m.color_specular);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m.ns);
         glBindTexture(GL_TEXTURE_2D, texture[m.texture]);
     }
     else
     {
         // default material
-        GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
-        GLfloat mat_shininess[] = {50.0};
+        GLfloat mat_ambient[] = {0.2, 0.2, 0.2, 1.0};
+        GLfloat mat_diffuse[] = {0.6, 0.6, 0.6, 1.0};
+        GLfloat mat_specular[] = {0.5, 0.5, 0.5, 1.0};
+        GLfloat mat_shininess[] = {1.0};
 
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+        glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 }

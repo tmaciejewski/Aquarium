@@ -44,6 +44,8 @@ class Model
         struct Material
         {
             GLfloat color_ambient[3], color_diffuse[3], color_specular[3];
+            GLfloat ns, d;
+            unsigned illum;
             std::string texture;
         };
 
@@ -74,7 +76,7 @@ class Model
             const std::vector<GLfloat> *tmp_buf, unsigned *index);
         unsigned addFace(std::vector<GLfloat> &buf,
             const std::vector<GLfloat> *tmp_buf, std::istream &s);
-        unsigned parseIndices(std::istream &s, unsigned *index, size_t n = 2);
+        unsigned parseIndices(std::istream &s, unsigned *index, size_t n = 3);
         void verticesFromIndex(unsigned vi, unsigned ti, GLfloat *v, GLfloat *t);
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);

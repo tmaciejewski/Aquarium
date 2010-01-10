@@ -40,7 +40,8 @@ std::string model = "clownfish";
 SDL_Surface * setVideoMode()
 {
     SDL_Surface *surface;
-    int flags = SDL_OPENGL | SDL_RESIZABLE;
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    int flags = SDL_OPENGL | SDL_RESIZABLE | SDL_DOUBLEBUF;
     if ((surface = SDL_SetVideoMode(width, height, 0, flags)) == NULL)
     {
         std::cerr << "Unable to create OpenGL screen: " << SDL_GetError() << '\n';
@@ -72,10 +73,10 @@ void display()
     glTranslatef(0.0, 0.0, -1.1);
     glBindTexture(GL_TEXTURE_2D, waterTex);
     glBegin(GL_QUADS);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, 1.0, 0.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
     glTexCoord2f(0.0, 1.0); glVertex3f(1.0, -1.0, 0.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, 1.0, 0.0);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
     glEnd();
 
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -94,32 +95,23 @@ void display()
 
 void initGL()
 {
-    GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1.0};
-    GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
-    GLfloat light_specular[] = {0.9, 0.9, 0.9, 1.0};
-    GLfloat light_position[] = {3.0, 0.0, -5.0, 1.0};
+    GLfloat light_position[] = {0.0, 0.0, 1.0, 10.0};
+    GLfloat light_specular[] = {0.0, 0.0, 0.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
-    glShadeModel(GL_SMOOTH);
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.5);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 1);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.1);
 
     glEnable(GL_LIGHT0);
-
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
-    glDisable(GL_CULL_FACE);
-
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
+    glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
 
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glShadeModel(GL_SMOOTH);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     glGenTextures(1, &waterTex);
