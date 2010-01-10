@@ -53,7 +53,7 @@ class Model
         {
             GLenum mode;
             GLfloat *vertices;
-            size_t count, stride;
+            size_t count;
             std::string material;
 
             Buffer() : vertices(NULL), mode(GL_TRIANGLES) {}

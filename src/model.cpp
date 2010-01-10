@@ -95,7 +95,6 @@ void Model::addBuffer(const std::vector<GLfloat> &buf,
         Buffer b;
         b.material = mtl;
         b.count = count;
-        b.stride = buf.size() / b.count;
         b.vertices = new GLfloat[buf.size()];
         std::copy(buf.begin(), buf.end(), b.vertices);
         buffer.push_back(b);
@@ -210,16 +209,16 @@ void Model::addVertex(std::vector<GLfloat> &buf,
         n[2] = v[2];
     }
 
-    buf.push_back(v[0]);
-    buf.push_back(v[1]);
-    buf.push_back(v[2]);
-
     buf.push_back(t[0]);
     buf.push_back(t[1]);
 
     buf.push_back(n[0]);
     buf.push_back(n[1]);
     buf.push_back(n[2]);
+
+    buf.push_back(v[0]);
+    buf.push_back(v[1]);
+    buf.push_back(v[2]);
 }
 
 unsigned Model::parseIndices(std::istream &s, unsigned *index, size_t n)
@@ -345,10 +344,8 @@ void Model::display(const GLfloat scale)
     for (std::vector<Buffer>::iterator it = buffer.begin();
         it != buffer.end(); ++it)
     {
-        glVertexPointer(3, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices + 3);
-        glNormalPointer(GL_FLOAT, sizeof(GLfloat) * it->stride, it->vertices + 5);
         useMaterial(it->material);
+        glInterleavedArrays(GL_T2F_N3F_V3F, 0, it->vertices);
         glDrawArrays(it->mode, 0, it->count);
     }
     glDisableClientState(GL_VERTEX_ARRAY);
