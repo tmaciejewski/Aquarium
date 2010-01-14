@@ -20,6 +20,7 @@
 
 #include "modellib.hpp"
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 ModelLib::ModelLib()
 {
@@ -45,6 +46,11 @@ void ModelLib::loadLib(const char *p)
 {
     namespace fs = boost::filesystem;
     fs::path path(p);
+    if (!fs::exists(p))
+    {
+        std::cout << "Path doesn't exist: " << p << '\n';
+        return;
+    }
     fs::recursive_directory_iterator it(path), end;
     while (it != end)
     {

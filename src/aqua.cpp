@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 #include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <GL/glu.h>
 #include <GL/gl.h>
@@ -36,6 +37,35 @@ std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
 bool lighting = true;
 std::string model = "clownfish";
+GLfloat light_position[] = {0.0, 0.0, 1.0, 10.0};
+
+class Camera
+{
+        GLfloat x, y, z;
+
+    public:
+
+        GLfloat hAngle, vAngle;
+
+        Camera() : x(0.0), y(0.0), z(0.0), hAngle(0.0), vAngle(0.0)
+        {
+        }
+
+        void set()
+        {
+            glRotatef(-vAngle * (180.0 / M_PI), 1.0, 0.0, 0.0);
+            glRotatef(hAngle * (180.0 / M_PI), 0.0, 1.0, 0.0);
+            glTranslatef(-x, -y, -z);
+        }
+
+        void move(GLfloat len = 1.0)
+        {
+            y += len * sin(vAngle);
+            x += len * cos(vAngle)*sin(hAngle);
+            z -= len * cos(vAngle)*cos(hAngle);
+        }
+
+} camera;
 
 SDL_Surface * setVideoMode()
 {
@@ -82,6 +112,11 @@ void display()
     glClear(GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
+
+    camera.set();
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
     glTranslatef(0.0, -1.0, -5.0);
     glRotatef(angle, 0.0, 1.0, 0.0);
 
@@ -95,12 +130,10 @@ void display()
 
 void initGL()
 {
-    GLfloat light_position[] = {0.0, 0.0, 1.0, 10.0};
     GLfloat light_specular[] = {0.0, 0.0, 0.0, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
 
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.1);
@@ -131,7 +164,7 @@ void resize(int w, int h)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0, width/height, 1.0, 100.0);
+    gluPerspective(60.0, width/height, 0.01, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -170,6 +203,24 @@ void update()
         scale = 0.005;
         keyPressed['b'] = false;
     }
+
+    if (keyPressed[SDLK_LEFT])
+        camera.hAngle -= 0.05;
+
+    if (keyPressed[SDLK_RIGHT])
+        camera.hAngle += 0.05;
+
+    if (keyPressed[SDLK_PAGEUP])
+        camera.vAngle += 0.05;
+
+    if (keyPressed[SDLK_PAGEDOWN])
+        camera.vAngle -= 0.05;
+
+    if (keyPressed[SDLK_UP])
+        camera.move(0.5);
+
+    if (keyPressed[SDLK_DOWN])
+        camera.move(-.5);
 
     angle += 1.0;
 
