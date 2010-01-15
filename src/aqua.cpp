@@ -26,18 +26,17 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include "modellib.hpp"
-
+#include "aquarium.hpp"
 #include "../config.h"
 
 ModelLib modelLib;
+Aquarium aquarium(modelLib);
 unsigned width = 640, height = 480;
-GLfloat angle, scale = 7.0;
 GLuint waterTex;
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting = true;
-std::string model = "clownfish";
-GLfloat light_position[] = {0.0, 0.0, 1.0, 10.0};
+bool lighting = false;
+GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
 
 class Camera
 {
@@ -117,13 +116,10 @@ void display()
 
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-    glTranslatef(0.0, -1.0, -5.0);
-    glRotatef(angle, 0.0, 1.0, 0.0);
-
     if (lighting)
         glEnable(GL_LIGHTING);
 
-    modelLib.display(model, scale);
+    aquarium.display();
 
     SDL_GL_SwapBuffers();
 }
@@ -169,7 +165,7 @@ void resize(int w, int h)
     glLoadIdentity();
 }
 
-void update()
+void keyboard()
 {
     if(keyPressed['1'])
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -181,27 +177,6 @@ void update()
     {
         lighting = !lighting;
         keyPressed['l'] = false;
-    }
-
-    if(keyPressed['g'])
-    {
-        model = "goldenfish";
-        scale = 0.01;
-        keyPressed['g'] = false;
-    }
-
-    if (keyPressed['c'])
-    {
-        model = "clownfish";
-        scale = 7.0;
-        keyPressed['c'] = false;
-    }
-
-    if (keyPressed['b'])
-    {
-        model = "ladybug";
-        scale = 0.005;
-        keyPressed['b'] = false;
     }
 
     if (keyPressed[SDLK_LEFT])
@@ -221,11 +196,12 @@ void update()
 
     if (keyPressed[SDLK_DOWN])
         camera.move(-.5);
+}
 
-    angle += 1.0;
-
-    if (angle > 360)
-        angle -= 360;
+void update()
+{
+    keyboard();
+    aquarium.update();
 }
 
 void run()
@@ -283,15 +259,17 @@ int main(int argc, char **argv)
 
     if (argc > 1)
     {
-        model = argv[1];
-    }
+        GLfloat scale = 1.0;
 
-    if (argc > 2)
-    {
-        scale = atof(argv[2]);
-    }
+        if (argc > 2)
+        {
+            scale = atof(argv[2]);
+        }
 
-    std::cout << "Model is " << model << std::endl;
+        aquarium.addModel(argv[1], scale);
+    }
+    else
+        aquarium.addModel("clownfish", 5.0);
 
     run();
 

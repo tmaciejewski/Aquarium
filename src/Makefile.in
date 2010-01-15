@@ -45,7 +45,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_aqua_OBJECTS = aqua.$(OBJEXT) model.$(OBJEXT) modellib.$(OBJEXT)
+am_aqua_OBJECTS = aqua.$(OBJEXT) model.$(OBJEXT) modellib.$(OBJEXT) \
+	fish.$(OBJEXT) aquarium.$(OBJEXT)
 aqua_OBJECTS = $(am_aqua_OBJECTS)
 aqua_DEPENDENCIES =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -158,7 +159,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -DDATADIR=\""$(pkgdatadir)"\" -DGL_GLEXT_PROTOTYPES
 aqua_LDADD = -lSDL -lSDL_image -lGL -lGLU -lboost_filesystem
-aqua_SOURCES = aqua.cpp model.hpp model.cpp modellib.hpp modellib.cpp
+aqua_SOURCES = aqua.cpp model.hpp model.cpp modellib.hpp modellib.cpp \
+               fish.hpp fish.cpp aquarium.hpp aquarium.cpp
+
 all: all-am
 
 .SUFFIXES:
@@ -241,6 +244,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aqua.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aquarium.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fish.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modellib.Po@am__quote@
 
