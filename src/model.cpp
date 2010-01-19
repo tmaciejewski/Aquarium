@@ -332,7 +332,7 @@ void Model::loadMaterialLibrary(const char *mtlfile)
     }
 }
 
-void Model::display(const GLfloat scale)
+void Model::display(const GLfloat scale) const
 {
     glPushMatrix();
 
@@ -341,7 +341,7 @@ void Model::display(const GLfloat scale)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
-    for (std::vector<Buffer>::iterator it = buffer.begin();
+    for (std::vector<Buffer>::const_iterator it = buffer.begin();
         it != buffer.end(); ++it)
     {
         useMaterial(it->material);
@@ -373,16 +373,20 @@ void Model::display(const GLfloat scale)
     glPopMatrix();
 }
 
-void Model::useMaterial(const std::string &mtl)
+void Model::useMaterial(const std::string &mtl) const
 {
-    if (material.find(mtl) != material.end())
+    std::map<std::string, Material>::const_iterator matIt = material.find(mtl);
+    if (matIt != material.end())
     {
-        Material &m = material[mtl];
+        const Material &m = matIt->second;
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, m.color_ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, m.color_diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m.color_specular);
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, m.ns);
-        glBindTexture(GL_TEXTURE_2D, texture[m.texture]);
+
+        std::map<std::string, GLuint>::const_iterator texIt = texture.find(m.texture);
+        if (texIt != texture.end())
+            glBindTexture(GL_TEXTURE_2D, texIt->second);
     }
     else
     {

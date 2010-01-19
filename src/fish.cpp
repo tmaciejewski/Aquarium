@@ -20,11 +20,10 @@
 
 #include "fish.hpp"
 
-Fish::Fish(const char *m, ModelLib &l, GLfloat s)
-    : model(m), lib(l), x(0.0), y(0.0), z(0.0), scale(s), vAngle(40.0),
-      hAngle(0.0)
+Fish::Fish(const Model *m, GLfloat s)
+    : model(m), x(0.0), y(0.0), z(-5.0), scale(s), vAngle(0.0),
+      hAngle(0.0), state(S_MOVING)
 {
-
 }
 
 Fish::~Fish()
@@ -38,26 +37,36 @@ void Fish::display()
     glTranslatef(x, y, z);
     glRotatef(hAngle * (180.0 / M_PI), 0.0, 1.0, 0.0);
     glRotatef(-vAngle * (180.0 / M_PI), 0.0, 0.0, 1.0);
-    lib.display(model, scale);
+    if (model)
+        model->display(scale);
     glPopMatrix();
 }
 
 void Fish::update()
 {
-    static GLfloat t = 0.0;
-    hAngle += 0.05;
-
-    if (hAngle > 2 * M_PI)
+    if (state == S_MOVING)
     {
-        hAngle -= 2 * M_PI;
+        //static GLfloat t = 0;
+        //hAngle += 0.05;
+
+        if (hAngle > 2 * M_PI)
+        {
+            hAngle -= 2 * M_PI;
+        }
+
+        //vAngle = M_PI / 4.0 * sin(t);
+
+        //t += 0.02;
+
+        //if (t > 2 * M_PI)
+            //t -= 2 * M_PI;
+
+        swim(0.1);
+
+        if (x > 10.0 || x < -10.0)
+        {
+            x = (x > 0 ? 10.0 : -10.0);
+            hAngle += M_PI;
+        }
     }
-
-    vAngle = M_PI / 4.0 * sin(t);
-
-    t += 0.02;
-
-    if (t > 2 * M_PI)
-        t -= 2 * M_PI;
-
-    move(0.1);
 }

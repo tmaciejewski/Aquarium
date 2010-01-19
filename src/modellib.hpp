@@ -31,7 +31,15 @@ class ModelLib
         virtual ~ModelLib();
 
         void loadLib(const char *p);
-        void display(const std::string &modelName, GLfloat scale = 1.0);
+        const Model *operator[](const std::string &modelName) const
+        {
+            std::map<std::string, Model *>::const_iterator it;
+            it = model.find(modelName);
+            if (it == model.end())
+                return NULL;
+
+            return it->second;
+        }
 
     private:
         std::map<std::string, Model *> model;

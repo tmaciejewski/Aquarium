@@ -30,7 +30,7 @@
 #include "../config.h"
 
 ModelLib modelLib;
-Aquarium aquarium(modelLib);
+Aquarium aquarium;
 unsigned width = 640, height = 480;
 GLuint waterTex;
 std::vector<bool> keyPressed(SDLK_LAST);
@@ -180,10 +180,10 @@ void keyboard()
     }
 
     if (keyPressed[SDLK_LEFT])
-        camera.hAngle -= 0.05;
+        camera.hAngle -= 0.02;
 
     if (keyPressed[SDLK_RIGHT])
-        camera.hAngle += 0.05;
+        camera.hAngle += 0.02;
 
     if (keyPressed[SDLK_PAGEUP])
         camera.vAngle += 0.05;
@@ -217,7 +217,7 @@ void run()
         {
             if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
             {
-                keyPressed[event.key.keysym.sym] = static_cast<bool>(event.key.state);
+                keyPressed[event.key.keysym.sym] = event.key.state;
             }
 
             if (event.type == SDL_VIDEORESIZE)
@@ -239,6 +239,9 @@ void run()
 
 int main(int argc, char **argv)
 {
+    std::string model = "clownfish";
+    GLfloat scale = 5.0;
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         std::cerr << "Unable to initialize SDL: " << SDL_GetError() << '\n';
@@ -259,17 +262,20 @@ int main(int argc, char **argv)
 
     if (argc > 1)
     {
-        GLfloat scale = 1.0;
-
         if (argc > 2)
         {
             scale = atof(argv[2]);
         }
 
-        aquarium.addModel(argv[1], scale);
+        model = argv[1];
     }
-    else
-        aquarium.addModel("clownfish", 5.0);
+
+    aquarium.addFish(modelLib[model], scale);
+
+    Fish *f = new Fish(modelLib["clownfish"], 5.0);
+    f->setXYZ(-5.0, 0.0, -6.0);
+    f->turn(M_PI, 0.0);
+    aquarium.addFish(f);
 
     run();
 

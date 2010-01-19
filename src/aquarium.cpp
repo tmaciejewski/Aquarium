@@ -20,6 +20,11 @@
 
 #include "aquarium.hpp"
 
+Aquarium::Aquarium()
+{
+    srand(time(0));
+}
+
 Aquarium::~Aquarium()
 {
     for(std::vector<Fish*>::iterator it = fish.begin();
@@ -29,9 +34,9 @@ Aquarium::~Aquarium()
     }
 }
 
-void Aquarium::display()
+void Aquarium::display() const
 {
-    for(std::vector<Fish*>::iterator it = fish.begin();
+    for(std::vector<Fish*>::const_iterator it = fish.begin();
         it != fish.end(); ++it)
     {
         (*it)->display();
@@ -47,8 +52,13 @@ void Aquarium::update()
     }
 }
 
-void Aquarium::addModel(const char *model, GLfloat scale)
+void Aquarium::addFish(const Model *model, GLfloat scale)
 {
-    Fish *f = new Fish(model, lib, scale);
+    Fish *f = new Fish(model, scale);
+    addFish(f);
+}
+
+void Aquarium::addFish(Fish *f)
+{
     fish.push_back(f);
 }

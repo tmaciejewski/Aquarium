@@ -37,7 +37,7 @@ class Model
         virtual ~Model();
 
         void loadObj(const char *path, const char *name);
-        void display(const GLfloat scale = 1.0);
+        void display(const GLfloat scale = 1.0) const;
 
     private:
 
@@ -80,7 +80,7 @@ class Model
         void verticesFromIndex(unsigned vi, unsigned ti, GLfloat *v, GLfloat *t);
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);
-        void useMaterial(const std::string &mtl);
+        void useMaterial(const std::string &mtl) const;
 
 };
 

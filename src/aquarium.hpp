@@ -29,16 +29,16 @@
 class Aquarium
 {
     public:
-        Aquarium(ModelLib &l) : lib(l) { srand(time(0)); }
+        Aquarium();
         virtual ~Aquarium();
 
-        void display();
+        void display() const;
         void update();
 
-        void addModel(const char *model, GLfloat scale = 1.0);
+        void addFish(const Model *model, GLfloat scale = 1.0);
+        void addFish(Fish *f);
 
     private:
-        ModelLib &lib;
         std::vector<Fish *> fish;
         GLfloat min[3], max[3];
 };

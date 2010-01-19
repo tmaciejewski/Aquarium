@@ -27,13 +27,16 @@
 class Fish
 {
     public:
-        Fish(const char *m, ModelLib &l, GLfloat s = 1.0);
+
+        enum State { S_STOP, S_MOVING, S_COLLISION };
+
+        Fish(const Model *m = NULL, GLfloat s = 1.0);
         virtual ~Fish();
 
         void display();
         void update();
 
-        void setModel(const char *m)
+        void setModel(const Model *m)
         {
             model = m;
         }
@@ -43,7 +46,13 @@ class Fish
             x = _x; y = _y; z = _z;
         }
 
-        void move(GLfloat len = 1.0)
+        void turn(GLfloat h, GLfloat v)
+        {
+            hAngle += h;
+            vAngle += v;
+        }
+
+        void swim(GLfloat len = 1.0)
         {
             y += len * sin(vAngle);
             x -= len * cos(vAngle)*cos(hAngle);
@@ -51,9 +60,9 @@ class Fish
         }
 
     private:
-        ModelLib &lib;
-        std::string model;
+        const Model *model;
         GLfloat x, y, z, hAngle, vAngle, scale;
+        State state;
 };
 
 #endif /* FISH_HPP */
