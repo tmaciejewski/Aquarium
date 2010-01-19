@@ -40,11 +40,8 @@ GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
 
 class Camera
 {
-        GLfloat x, y, z;
-
     public:
-
-        GLfloat hAngle, vAngle;
+        GLfloat x, y, z, hAngle, vAngle;
 
         Camera() : x(0.0), y(0.0), z(0.0), hAngle(0.0), vAngle(0.0)
         {
@@ -180,16 +177,24 @@ void keyboard()
     }
 
     if (keyPressed[SDLK_LEFT])
-        camera.hAngle -= 0.02;
+    {
+        camera.hAngle -= M_PI / 2.0;
+        camera.move(0.1);
+        camera.hAngle += M_PI / 2.0;
+    }
 
     if (keyPressed[SDLK_RIGHT])
-        camera.hAngle += 0.02;
+    {
+        camera.hAngle += M_PI / 2.0;
+        camera.move(0.1);
+        camera.hAngle -= M_PI / 2.0;
+    }
 
     if (keyPressed[SDLK_PAGEUP])
-        camera.vAngle += 0.05;
+        camera.y += 0.1;
 
     if (keyPressed[SDLK_PAGEDOWN])
-        camera.vAngle -= 0.05;
+        camera.y -= 0.1;
 
     if (keyPressed[SDLK_UP])
         camera.move(0.5);
@@ -219,8 +224,21 @@ void run()
             {
                 keyPressed[event.key.keysym.sym] = event.key.state;
             }
-
-            if (event.type == SDL_VIDEORESIZE)
+            else if (event.type == SDL_MOUSEMOTION)
+            {
+                GLfloat hAngle = -2 * M_PI + (event.motion.x * 4 * M_PI) / width,
+                        vAngle = M_PI_2 + (event.motion.y * -M_PI) / height;
+                camera.hAngle = hAngle;
+                camera.vAngle = vAngle;
+            }
+            else if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (event.button.button == SDL_BUTTON_LEFT)
+                    SDL_WM_GrabInput(SDL_GRAB_ON);
+                else if (event.button.button == SDL_BUTTON_RIGHT)
+                    SDL_WM_GrabInput(SDL_GRAB_OFF);
+            }
+            else if (event.type == SDL_VIDEORESIZE)
             {
                 width = event.resize.w;
                 height = event.resize.h;
