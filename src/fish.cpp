@@ -44,7 +44,7 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.1;
+    static GLfloat speed = 0.05;
     static GLfloat len = 1.0;
     if (state == S_MOVING)
     {

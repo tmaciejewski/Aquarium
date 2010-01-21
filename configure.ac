@@ -1,9 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.65])
 AC_INIT([Aqua], [1.0], [ponton@jabster.pl])
-AM_INIT_AUTOMAKE([1.11], [foreign])
+AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src/aqua.cpp])
 AC_CONFIG_HEADERS([config.h])
 
