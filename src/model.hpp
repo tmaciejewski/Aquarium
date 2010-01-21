@@ -39,6 +39,10 @@ class Model
         void loadObj(const char *path, const char *name);
         void display(const GLfloat scale = 1.0) const;
 
+        bool collides(GLfloat x, GLfloat y, GLfloat z) const;
+
+        const GLfloat *getBBox() const { return boundingBox; }
+
     private:
 
         struct Material
@@ -81,6 +85,7 @@ class Model
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);
         void useMaterial(const std::string &mtl) const;
+        void normalize();
 
 };
 

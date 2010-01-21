@@ -259,6 +259,7 @@ int main(int argc, char **argv)
 {
     std::string model = "clownfish";
     GLfloat scale = 5.0;
+    unsigned n = 10;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -278,22 +279,27 @@ int main(int argc, char **argv)
     modelLib.loadLib(DATADIR);
     modelLib.loadLib(".");
 
+    aquarium.initShader();
+
     if (argc > 1)
     {
-        if (argc > 2)
-        {
-            scale = atof(argv[2]);
-        }
-
-        model = argv[1];
+        n = atoi(argv[1]);
     }
 
-    aquarium.addFish(modelLib[model], scale);
+    if (argc > 2)
+    {
+        model = argv[2];
+    }
 
-    Fish *f = new Fish(modelLib["clownfish"], 5.0);
-    f->setXYZ(-5.0, 0.0, -6.0);
-    f->turn(M_PI, 0.0);
-    aquarium.addFish(f);
+    if (argc > 3)
+    {
+        scale = atof(argv[3]);
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        aquarium.addFish(modelLib[model], scale);
+    }
 
     run();
 

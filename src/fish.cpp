@@ -31,7 +31,7 @@ Fish::~Fish()
 
 }
 
-void Fish::display()
+void Fish::display() const
 {
     glPushMatrix();
     glTranslatef(x, y, z);
@@ -44,29 +44,48 @@ void Fish::display()
 
 void Fish::update()
 {
+    static GLfloat speed = 0.1;
+    static GLfloat len = 1.0;
     if (state == S_MOVING)
     {
-        //static GLfloat t = 0;
-        //hAngle += 0.05;
-
-        if (hAngle > 2 * M_PI)
+        if (len <= 0)
         {
-            hAngle -= 2 * M_PI;
+            len = 1.0 + 5.0 * (rand() / (float) RAND_MAX);
+            hAngle += M_PI * (2.0 * (rand() / (float) RAND_MAX) - 1.0);
         }
 
-        //vAngle = M_PI / 4.0 * sin(t);
+        swim(speed);
+        len -= speed;
 
-        //t += 0.02;
-
-        //if (t > 2 * M_PI)
-            //t -= 2 * M_PI;
-
-        swim(0.1);
-
-        if (x > 10.0 || x < -10.0)
+        if (x > 100.0 || x < -100.0)
         {
-            x = (x > 0 ? 10.0 : -10.0);
-            hAngle += M_PI;
+            state = S_COLLISION;
         }
     }
+    else if (state == S_COLLISION)
+    {
+        //hAngle += M_PI;
+        swim(-speed);
+        //state = S_MOVING;
+    }
+}
+
+bool Fish::collides(const Fish *f) const
+{
+    if (model && f->model)
+    {
+        const GLfloat *bbox;
+        bbox = f->model->getBBox();
+        for (int i = 0; i < 8; ++i)
+        {
+            GLfloat dx = (f->x - x) + f->scale * bbox[3 * i];
+            GLfloat dy = (f->y - y) + f->scale * bbox[3 * i + 1];
+            GLfloat dz = (f->z - z) + f->scale * bbox[3 * i + 2];
+
+            if (model->collides(dx / scale, dy / scale, dz / scale))
+                return true;
+        }
+    }
+    else
+        return false;
 }

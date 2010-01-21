@@ -38,9 +38,15 @@ class Aquarium
         void addFish(const Model *model, GLfloat scale = 1.0);
         void addFish(Fish *f);
 
+        void initShader();
+
     private:
         std::vector<Fish *> fish;
         GLfloat min[3], max[3];
+        GLint timeLocation;
+        GLuint program;
+
+        bool collides(const Fish *f) const;
 };
 
 #endif /* AQUARIUM_HPP */

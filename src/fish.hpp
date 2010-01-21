@@ -33,12 +33,29 @@ class Fish
         Fish(const Model *m = NULL, GLfloat s = 1.0);
         virtual ~Fish();
 
-        void display();
+        void display() const;
         void update();
 
-        void setModel(const Model *m)
+        bool collides(const Fish *f) const;
+
+        const Model *getModel() const
         {
-            model = m;
+            return model;
+        }
+
+        void setModel(const Model *newModel)
+        {
+            model = newModel;
+        }
+
+        State getState() const
+        {
+            return state;
+        }
+
+        void setState(State newState)
+        {
+            state = newState;
         }
 
         void setXYZ(GLfloat _x, GLfloat _y, GLfloat _z)

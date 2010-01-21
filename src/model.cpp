@@ -387,6 +387,8 @@ void Model::useMaterial(const std::string &mtl) const
         std::map<std::string, GLuint>::const_iterator texIt = texture.find(m.texture);
         if (texIt != texture.end())
             glBindTexture(GL_TEXTURE_2D, texIt->second);
+        else
+            glBindTexture(GL_TEXTURE_2D, 0);
     }
     else
     {
@@ -427,6 +429,26 @@ void Model::loadTexture(const std::string &texname)
                         img->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
                         img->pixels);
             SDL_FreeSurface(img);
+        }
+    }
+}
+
+bool Model::collides(GLfloat x, GLfloat y, GLfloat z) const
+{
+    bool r = x >= min[0] && x <= max[0] && y >= min[1] && y <= max[1]
+              && z >= min[2] && z <= max[2];
+
+    return r;
+}
+
+void Model::normalize()
+{
+    for (std::vector<Buffer>::const_iterator it = buffer.begin();
+        it != buffer.end(); ++it)
+    {
+        for (int i = 0; i < it->count; i += 8)
+        {
+
         }
     }
 }

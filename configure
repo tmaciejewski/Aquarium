@@ -2500,8 +2500,8 @@ fi
 
 
 # Define the identity of the package.
- PACKAGE='aqua'
- VERSION='1.0'
+ PACKAGE=1.11
+ VERSION=foreign
 
 
 cat >>confdefs.h <<_ACEOF
