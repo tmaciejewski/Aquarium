@@ -57,36 +57,6 @@ void Model::clear()
     max[0] = max[1] = max[2] = 0.0;
 }
 
-void Model::updateBoundBox(GLfloat v[])
-{
-    for (int i = 0; i < 3; ++i)
-    {
-        if (v[i] > max[i])
-            max[i] = v[i];
-
-        if (v[i] < min[i])
-            min[i] = v[i];
-    }
-
-    for (int i = 0; i < 8; ++i)
-    {
-        if (i == 0 || i == 3 || i == 4 || i == 7)
-            boundingBox[3 * i + 0] = max[0];
-        else
-            boundingBox[3 * i + 0] = min[0];
-
-        if (i <= 3)
-            boundingBox[3 * i + 1] = max[1];
-        else
-            boundingBox[3 * i + 1] = min[1];
-
-        if (i == 0 || i == 1 || i == 4 || i == 5)
-            boundingBox[3 * i + 2] = max[2];
-        else
-            boundingBox[3 * i + 2] = min[2];
-    }
-}
-
 void Model::addBuffer(const std::vector<GLfloat> &buf,
                         const size_t count, std::string mtl)
 {
@@ -166,6 +136,11 @@ void Model::loadObj(const char *path, const char *name)
 
                 s >> mtl;
             }
+            else if (command == "" || command == "g" || command == "s"
+                       || command == "o")
+            {
+
+            }
             else
             {
                 std::cout << '\'' << command << "' not implemented\n";
@@ -174,6 +149,43 @@ void Model::loadObj(const char *path, const char *name)
     }
 
     addBuffer(buf, count, mtl);
+
+    std::cout << "Loaded with size: (" << size[0] << ", " << size[1]
+              << ", " << size[2] << ")\n";
+}
+
+void Model::updateBoundBox(const GLfloat v[])
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        if (v[i] > max[i])
+            max[i] = v[i];
+
+        if (v[i] < min[i])
+            min[i] = v[i];
+
+        size[i] = max[i] - min[i];
+        if (size[i] < 0) size[i] = -size[i];
+        center[i] = min[i] + size[i] / 2.0;
+    }
+
+    for (int i = 0; i < 8; ++i)
+    {
+        if (i == 0 || i == 3 || i == 4 || i == 7)
+            boundingBox[3 * i + 0] = max[0];
+        else
+            boundingBox[3 * i + 0] = min[0];
+
+        if (i <= 3)
+            boundingBox[3 * i + 1] = max[1];
+        else
+            boundingBox[3 * i + 1] = min[1];
+
+        if (i == 0 || i == 1 || i == 4 || i == 5)
+            boundingBox[3 * i + 2] = max[2];
+        else
+            boundingBox[3 * i + 2] = min[2];
+    }
 }
 
 void Model::addVertex(std::vector<GLfloat> &buf,
@@ -322,7 +334,7 @@ void Model::loadMaterialLibrary(const char *mtlfile)
                     s >> mtl.texture;
                     loadTexture(mtl.texture);
                 }
-                else
+                else if (command != "")
                 {
                     std::cout << "Material command " << command
                         << " not implemented\n";
@@ -336,6 +348,7 @@ void Model::display(const GLfloat scale) const
 {
     glPushMatrix();
 
+    glTranslatef(-center[0] * scale, -center[1] * scale, -center[2] * scale);
     glScalef(scale, scale, scale);
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -420,7 +433,7 @@ void Model::loadTexture(const std::string &texname)
             glGenTextures(1, &t);
             texture[texname] = t;
             glBindTexture(GL_TEXTURE_2D, texture[texname]);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w,
@@ -429,14 +442,6 @@ void Model::loadTexture(const std::string &texname)
             SDL_FreeSurface(img);
         }
     }
-}
-
-bool Model::collides(GLfloat x, GLfloat y, GLfloat z) const
-{
-    bool r = x >= min[0] && x <= max[0] && y >= min[1] && y <= max[1]
-              && z >= min[2] && z <= max[2];
-
-    return r;
 }
 
 void Model::normalize()

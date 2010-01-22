@@ -21,9 +21,10 @@
 #include "fish.hpp"
 
 Fish::Fish(const Model *m, GLfloat s)
-    : model(m), x(0.0), y(0.0), z(-5.0), scale(s), vAngle(0.0),
+    : model(m), scale(s), vAngle(0.0),
       hAngle(0.0), state(S_MOVING)
 {
+    pos[0] = pos[1] = pos[2] = 0.0;
 }
 
 Fish::~Fish()
@@ -34,7 +35,7 @@ Fish::~Fish()
 void Fish::display() const
 {
     glPushMatrix();
-    glTranslatef(x, y, z);
+    glTranslatef(pos[0], pos[1], pos[2]);
     glRotatef(hAngle * (180.0 / M_PI), 0.0, 1.0, 0.0);
     glRotatef(-vAngle * (180.0 / M_PI), 0.0, 0.0, 1.0);
     if (model)
@@ -57,7 +58,7 @@ void Fish::update()
         swim(speed);
         len -= speed;
 
-        if (x > 100.0 || x < -100.0)
+        if (pos[0] > 100.0 || pos[0] < -100.0)
         {
             state = S_COLLISION;
         }
@@ -74,17 +75,20 @@ bool Fish::collides(const Fish *f) const
 {
     if (model && f->model)
     {
-        const GLfloat *bbox;
-        bbox = f->model->getBBox();
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < 3; ++i)
         {
-            GLfloat dx = (f->x - x) + f->scale * bbox[3 * i];
-            GLfloat dy = (f->y - y) + f->scale * bbox[3 * i + 1];
-            GLfloat dz = (f->z - z) + f->scale * bbox[3 * i + 2];
+            GLfloat dist = pos[i] + model->getCenter(i)
+                            - f->model->getCenter(i) - f->pos[i];
+            if (dist < 0)
+                dist = -dist;
 
-            if (model->collides(dx / scale, dy / scale, dz / scale))
-                return true;
+            if (dist >= (model->getSize(i) * scale + f->scale * f->model->getSize(i)) / 2.0)
+            {
+                return false;
+            }
         }
+
+        return true;
     }
     else
         return false;

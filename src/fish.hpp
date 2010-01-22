@@ -58,9 +58,9 @@ class Fish
             state = newState;
         }
 
-        void setXYZ(GLfloat _x, GLfloat _y, GLfloat _z)
+        void setXYZ(GLfloat x, GLfloat y, GLfloat z)
         {
-            x = _x; y = _y; z = _z;
+            pos[0] = x; pos[1] = y; pos[2] = z;
         }
 
         void turn(GLfloat h, GLfloat v)
@@ -71,14 +71,14 @@ class Fish
 
         void swim(GLfloat len = 1.0)
         {
-            y += len * sin(vAngle);
-            x -= len * cos(vAngle)*cos(hAngle);
-            z += len * cos(vAngle)*sin(hAngle);
+            pos[1] += len * sin(vAngle);
+            pos[0] -= len * cos(vAngle)*cos(hAngle);
+            pos[2] += len * cos(vAngle)*sin(hAngle);
         }
 
     private:
         const Model *model;
-        GLfloat x, y, z, hAngle, vAngle, scale;
+        GLfloat pos[3], hAngle, vAngle, scale;
         State state;
 };
 

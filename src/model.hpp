@@ -39,9 +39,8 @@ class Model
         void loadObj(const char *path, const char *name);
         void display(const GLfloat scale = 1.0) const;
 
-        bool collides(GLfloat x, GLfloat y, GLfloat z) const;
-
-        const GLfloat *getBBox() const { return boundingBox; }
+        GLfloat getCenter(unsigned i) const { return center[i]; }
+        GLfloat getSize(unsigned i) const { return size[i]; }
 
     private:
 
@@ -66,14 +65,14 @@ class Model
 
         std::vector<Buffer> buffer;
         GLfloat boundingBox[24];
-        GLfloat min[3], max[3];
+        GLfloat min[3], max[3], center[3], size[3];
 
         std::string modelPath;
         std::map<std::string, Material> material;
         std::map<std::string, GLuint> texture;
 
         void clear();
-        void updateBoundBox(GLfloat v[]);
+        void updateBoundBox(const GLfloat v[]);
         void loadMaterialLibrary(const char *mtlfile);
         void loadTexture(const std::string &texname);
         void addVertex(std::vector<GLfloat> &buf,

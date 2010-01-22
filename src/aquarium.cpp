@@ -74,7 +74,7 @@ bool Aquarium::collides(const Fish *f) const
     for(std::vector<Fish*>::const_iterator it = fish.begin();
         it != fish.end(); ++it)
     {
-        if (*it != f && (*it)->getState() == Fish::S_MOVING)
+        if (*it != f)
         {
             if (f->collides(*it))
                 return true;
@@ -88,8 +88,8 @@ void Aquarium::addFish(const Model *model, GLfloat scale)
 {
     Fish *f = new Fish(model, scale);
     GLfloat x, z;
-    x = rand() % 10 - 5;
-    z = rand() % 10 - 5;
+    x = rand() % 50 - 25;
+    z = rand() % 50 - 25;
     f->setXYZ(x, 0.0, z);
     addFish(f);
 }

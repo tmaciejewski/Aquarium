@@ -35,7 +35,7 @@ unsigned width = 640, height = 480;
 GLuint waterTex;
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting = false;
+bool lighting = false, gamePause = false;
 GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
 
 class Camera
@@ -111,7 +111,7 @@ void display()
 
     camera.set();
 
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    //glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     if (lighting)
         glEnable(GL_LIGHTING);
@@ -123,13 +123,14 @@ void display()
 
 void initGL()
 {
-    GLfloat light_specular[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light_specular[] = {.5, .5, .5, 1.0};
 
     glClearColor(0.3, 0.3, 0.8, 0.0);
 
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 1);
     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.1);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
@@ -201,12 +202,19 @@ void keyboard()
 
     if (keyPressed[SDLK_DOWN])
         camera.move(-.5);
+
+    if (keyPressed['p'])
+    {
+        gamePause = !gamePause;
+        keyPressed['p'] = false;
+    }
 }
 
 void update()
 {
     keyboard();
-    aquarium.update();
+    if (!gamePause)
+        aquarium.update();
 }
 
 void run()
