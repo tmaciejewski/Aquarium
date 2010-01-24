@@ -32,7 +32,7 @@
 ModelLib modelLib;
 Aquarium aquarium;
 unsigned width = 640, height = 480;
-GLuint waterTex;
+
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
 bool lighting = false, gamePause = false;
@@ -78,44 +78,12 @@ SDL_Surface * setVideoMode()
     return surface;
 }
 
-void setWaterTexture()
-{
-    SDL_Surface *water = IMG_Load(DATADIR "/water.jpg");
-    if (water)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, water->w,
-                    water->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                    water->pixels);
-        SDL_FreeSurface(water);
-    }
-}
-
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    glDisable(GL_LIGHTING);
-    glTranslatef(0.0, 0.0, -1.1);
-    glBindTexture(GL_TEXTURE_2D, waterTex);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 1.0); glVertex3f(1.0, -1.0, 0.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
-    glTexCoord2f(1.0, 0.0); glVertex3f(-1.0, 1.0, 0.0);
-    glTexCoord2f(1.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
-    glEnd();
-
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    glLoadIdentity();
-
     camera.set();
-
-    //glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-    if (lighting)
-        glEnable(GL_LIGHTING);
-
     aquarium.display();
 
     SDL_GL_SwapBuffers();
@@ -123,16 +91,8 @@ void display()
 
 void initGL()
 {
-    GLfloat light_specular[] = {.5, .5, .5, 1.0};
-
     glClearColor(0.3, 0.3, 0.8, 0.0);
 
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 1);
-    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.1);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-    glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
@@ -140,15 +100,6 @@ void initGL()
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glShadeModel(GL_SMOOTH);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    glGenTextures(1, &waterTex);
-    glBindTexture(GL_TEXTURE_2D, waterTex);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    setWaterTexture();
 }
 
 void resize(int w, int h)
@@ -266,7 +217,7 @@ void run()
 int main(int argc, char **argv)
 {
     std::string model = "clownfish";
-    GLfloat scale = 5.0;
+    GLfloat scale = 7.0;
     unsigned n = 10;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -287,7 +238,7 @@ int main(int argc, char **argv)
     modelLib.loadLib(DATADIR);
     modelLib.loadLib(".");
 
-    aquarium.initShader();
+    aquarium.init();
 
     if (argc > 1)
     {

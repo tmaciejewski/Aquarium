@@ -20,10 +20,12 @@
 
 #include "aquarium.hpp"
 
-Aquarium::Aquarium()
+Aquarium::Aquarium(GLuint width, GLuint height, GLuint depth)
 {
     srand(time(0));
-    //initShader();
+    size[0] = width;
+    size[1] = height;
+    size[2] = depth;
 }
 
 Aquarium::~Aquarium()
@@ -35,9 +37,39 @@ Aquarium::~Aquarium()
     }
 }
 
+void Aquarium::textureFromImg(GLuint t, const char *filename)
+{
+    SDL_Surface *img = IMG_Load(filename);
+    if (img)
+    {
+        glBindTexture(GL_TEXTURE_2D, t);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w,
+                    img->h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                    img->pixels);
+        SDL_FreeSurface(img);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+}
+
+void Aquarium::init()
+{
+    initShader();
+
+    glGenTextures(1, &waterTex);
+    glGenTextures(1, &sandTex);
+
+    textureFromImg(waterTex, DATADIR "/water.jpg");
+    textureFromImg(sandTex, DATADIR "/sand.jpg");
+}
+
 void Aquarium::display() const
 {
     static GLfloat t = 0.0;
+
+    displayAquarium();
+
     glUseProgram(program);
     glUniform1f(timeLocation, t);
     for(std::vector<Fish*>::const_iterator it = fish.begin();
@@ -53,6 +85,42 @@ void Aquarium::display() const
     glUseProgram(0);
 }
 
+void Aquarium::displaySquare(GLfloat width, GLfloat height) const
+{
+    GLfloat u = 1.0, v = 1.0;
+    glScalef(width / 2.0, height / 2.0, 1.0);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, v); glVertex3f(1.0, -1.0, 0.0);
+    glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
+    glTexCoord2f(u, 0.0); glVertex3f(-1.0, 1.0, 0.0);
+    glTexCoord2f(u, v); glVertex3f(-1.0, -1.0, 0.0);
+    glEnd();
+}
+
+void Aquarium::displayAquarium() const
+{
+    GLfloat matrix[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, waterTex);
+    glTranslatef(0.0, 0.0, -size[2] / 2.0);
+    displaySquare(size[0], size[1]);
+    glLoadMatrixf(matrix);
+    glTranslatef(-size[0] / 2.0, 0.0, 0.0);
+    glRotatef(90.0, 0.0, 1.0, 0.0);
+    displaySquare(size[2], size[1]);
+    glLoadMatrixf(matrix);
+    glTranslatef(size[0] / 2.0, 0.0, 0.0);
+    glRotatef(-90.0, 0.0, 1.0, 0.0);
+    displaySquare(size[2], size[1]);
+    glLoadMatrixf(matrix);
+    glBindTexture(GL_TEXTURE_2D, sandTex);
+    glTranslatef(0.0, -size[1] / 2.0, 0.0);
+    glRotatef(-90, 1.0, 0.0, 0.0);
+    displaySquare(size[0], size[2]);
+    glPopMatrix();
+}
+
 void Aquarium::update()
 {
 
@@ -65,7 +133,9 @@ void Aquarium::update()
             (*it)->setState(Fish::S_COLLISION);
         }
         else
+        {
             (*it)->setState(Fish::S_MOVING);
+        }
     }
 }
 
@@ -76,7 +146,14 @@ bool Aquarium::collides(const Fish *f) const
     {
         if (*it != f)
         {
+            GLfloat x, y, z;
             if (f->collides(*it))
+                return true;
+
+            f->getXYZ(&x, &y, &z);
+            if (x > size[0] / 2.0 || x < -size[0] / 2.0 ||
+                y > size[1] / 2.0 || y < -size[1] / 2.0 ||
+                z > size[2] / 2.0 || z < -size[2] / 2.0)
                 return true;
         }
     }
@@ -87,33 +164,19 @@ bool Aquarium::collides(const Fish *f) const
 void Aquarium::addFish(const Model *model, GLfloat scale)
 {
     Fish *f = new Fish(model, scale);
-    GLfloat x, z;
-    x = rand() % 50 - 25;
-    z = rand() % 50 - 25;
-    f->setXYZ(x, 0.0, z);
+    do {
+        GLfloat x, y, z;
+        x = size[0] * ((rand() / (float) RAND_MAX) - 1);
+        z = size[2] * ((rand() / (float) RAND_MAX) - 1);
+        y = 0.0; // size[1] * ((rand() / (float) RAND_MAX) - 1)
+        f->setXYZ(x, y, z);
+    } while (collides(f));
     addFish(f);
 }
 
 void Aquarium::addFish(Fish *f)
 {
     fish.push_back(f);
-}
-
-void printShaderInfoLog(GLuint obj)
-{
-    int infologLength = 0;
-    int charsWritten  = 0;
-    char *infoLog;
-
-    glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
-
-    if (infologLength > 0)
-    {
-        infoLog =  new char[infologLength];
-        glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
-        std::cout << infoLog << std::endl;
-        delete [] infoLog;
-    }
 }
 
 void printProgramInfoLog(GLuint obj)

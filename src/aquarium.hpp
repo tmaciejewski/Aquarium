@@ -29,7 +29,8 @@
 class Aquarium
 {
     public:
-        Aquarium();
+        Aquarium(GLuint width = 40.0, GLuint height = 30.0,
+                   GLuint depth = 20.0);
         virtual ~Aquarium();
 
         void display() const;
@@ -38,15 +39,19 @@ class Aquarium
         void addFish(const Model *model, GLfloat scale = 1.0);
         void addFish(Fish *f);
 
-        void initShader();
+        void init();
 
     private:
         std::vector<Fish *> fish;
-        GLfloat min[3], max[3];
+        GLfloat size[3];
         GLint timeLocation;
-        GLuint program;
+        GLuint program, waterTex, sandTex;
 
+        void textureFromImg(GLuint t, const char *filename);
+        void displayAquarium() const;
         bool collides(const Fish *f) const;
+        void initShader();
+        void displaySquare(GLfloat width, GLfloat height) const;
 };
 
 #endif /* AQUARIUM_HPP */

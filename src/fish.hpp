@@ -63,6 +63,11 @@ class Fish
             pos[0] = x; pos[1] = y; pos[2] = z;
         }
 
+        void getXYZ(GLfloat *x, GLfloat *y, GLfloat*z) const
+        {
+            *x = pos[0]; *y = pos[1]; *z = pos[2];
+        }
+
         void turn(GLfloat h, GLfloat v)
         {
             hAngle += h;
