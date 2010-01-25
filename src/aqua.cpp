@@ -54,7 +54,7 @@ class Camera
             glTranslatef(-x, -y, -z);
         }
 
-        void move(GLfloat len = 1.0)
+        void move(GLfloat len = 0.5)
         {
             y += len * sin(vAngle);
             x += len * cos(vAngle)*sin(hAngle);
@@ -133,7 +133,7 @@ void keyboard()
         GLfloat tmpAngle = camera.vAngle;
         camera.vAngle = 0.0;
         camera.hAngle -= M_PI_2;
-        camera.move(0.1);
+        camera.move();
         camera.hAngle += M_PI_2;
         camera.vAngle = tmpAngle;
     }
@@ -143,16 +143,26 @@ void keyboard()
         GLfloat tmpAngle = camera.vAngle;
         camera.vAngle = 0.0;
         camera.hAngle += M_PI_2;
-        camera.move(0.1);
+        camera.move();
         camera.hAngle -= M_PI_2;
         camera.vAngle = tmpAngle;
     }
 
     if (keyPressed[SDLK_PAGEUP])
-        camera.y += 0.1;
+    {
+        GLfloat tmpAngle = camera.vAngle;
+        camera.vAngle = M_PI_2;
+        camera.move();
+        camera.vAngle = tmpAngle;
+    }
 
     if (keyPressed[SDLK_PAGEDOWN])
-        camera.y -= 0.1;
+    {
+        GLfloat tmpAngle = camera.vAngle;
+        camera.vAngle = -M_PI_2;
+        camera.move();
+        camera.vAngle = tmpAngle;
+    }
 
     if (keyPressed[SDLK_UP])
         camera.move(0.5);
