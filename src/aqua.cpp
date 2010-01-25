@@ -130,16 +130,22 @@ void keyboard()
 
     if (keyPressed[SDLK_LEFT])
     {
-        camera.hAngle -= M_PI / 2.0;
+        GLfloat tmpAngle = camera.vAngle;
+        camera.vAngle = 0.0;
+        camera.hAngle -= M_PI_2;
         camera.move(0.1);
-        camera.hAngle += M_PI / 2.0;
+        camera.hAngle += M_PI_2;
+        camera.vAngle = tmpAngle;
     }
 
     if (keyPressed[SDLK_RIGHT])
     {
-        camera.hAngle += M_PI / 2.0;
+        GLfloat tmpAngle = camera.vAngle;
+        camera.vAngle = 0.0;
+        camera.hAngle += M_PI_2;
         camera.move(0.1);
-        camera.hAngle -= M_PI / 2.0;
+        camera.hAngle -= M_PI_2;
+        camera.vAngle = tmpAngle;
     }
 
     if (keyPressed[SDLK_PAGEUP])
