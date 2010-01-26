@@ -45,34 +45,31 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.05;
+    static GLfloat speed = 0.2;
+    static GLfloat len = 0.0;
     static State lastState = state;
+
+    if (len <= 0)
+    {
+        state = S_MOVING;
+        len = 1.0 + 5.0 * (rand() / (float) RAND_MAX);
+        hAngle += M_PI * (rand() / (float) RAND_MAX - 0.5);
+        vAngle = M_PI_2 * (rand() / (float) RAND_MAX - 0.5);
+    }
+
     if (state == S_MOVING)
     {
-        static GLfloat len = 1.0;
-
-        if (len <= 0)
-        {
-            len = 1.0 + 5.0 * (rand() / (float) RAND_MAX);
-            hAngle += M_PI * (2.0 * (rand() / (float) RAND_MAX) - 1.0);
-        }
-
         swim(speed);
         len -= speed;
-
-        if (pos[0] > 100.0 || pos[0] < -100.0)
-        {
-            state = S_COLLISION;
-        }
     }
     else if (state == S_COLLISION)
     {
-        static GLfloat turn = 0.05;
-        if (lastState == S_MOVING)
-            turn = turn * (rand() % 2 == 1 ? 1 : -1);
+        if (lastState != state)
+        {
+            hAngle = hAngle + M_PI;
+            vAngle = -vAngle;
+        }
 
-        //hAngle += turn;
-        hAngle = -hAngle;
         swim(speed);
     }
 

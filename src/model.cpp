@@ -149,9 +149,6 @@ void Model::loadObj(const char *path, const char *name)
     }
 
     addBuffer(buf, count, mtl);
-
-    std::cout << "Loaded with size: (" << size[0] << ", " << size[1]
-              << ", " << size[2] << ")\n";
 }
 
 void Model::updateBoundBox(const GLfloat v[])

@@ -29,14 +29,14 @@
 class Aquarium
 {
     public:
-        Aquarium(GLuint width = 40.0, GLuint height = 30.0,
+        Aquarium(GLuint width = 50.0, GLuint height = 30.0,
                    GLuint depth = 20.0);
         virtual ~Aquarium();
 
         void display() const;
         void update();
 
-        void addFish(const Model *model, GLfloat scale = 1.0);
+        bool addFish(const Model *model, GLfloat scale = 1.0);
         void addFish(Fish *f);
 
         void init();
@@ -45,7 +45,7 @@ class Aquarium
         std::vector<Fish *> fish;
         GLfloat size[3];
         GLint timeLocation;
-        GLuint program, waterTex, sandTex;
+        GLuint program, texture[3];
 
         void textureFromImg(GLuint t, const char *filename);
         void displayAquarium() const;

@@ -38,6 +38,11 @@ class Fish
 
         bool collides(const Fish *f) const;
 
+        GLfloat getScale() const
+        {
+            return scale;
+        }
+
         const Model *getModel() const
         {
             return model;
@@ -63,9 +68,9 @@ class Fish
             pos[0] = x; pos[1] = y; pos[2] = z;
         }
 
-        void getXYZ(GLfloat *x, GLfloat *y, GLfloat*z) const
+        const GLfloat *getXYZ() const
         {
-            *x = pos[0]; *y = pos[1]; *z = pos[2];
+            return pos;
         }
 
         void turn(GLfloat h, GLfloat v)

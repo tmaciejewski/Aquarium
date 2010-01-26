@@ -41,6 +41,7 @@ class Model
 
         GLfloat getCenter(unsigned i) const { return center[i]; }
         GLfloat getSize(unsigned i) const { return size[i]; }
+        const GLfloat *getBBox() const { return boundingBox; }
 
     private:
 
