@@ -25,6 +25,7 @@ Fish::Fish(const Model *m, GLfloat s)
       hAngle(0.0), state(S_MOVING)
 {
     pos[0] = pos[1] = pos[2] = 0.0;
+    oldPos[0] = oldPos[1] = oldPos[2] = 0.0;
 }
 
 Fish::~Fish()
@@ -45,9 +46,11 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.2;
+    static GLfloat speed = 0.5;
     static GLfloat len = 0.0;
     static State lastState = state;
+
+    std::copy(pos, pos + 3, oldPos);
 
     if (len <= 0)
     {

@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 {
     std::string model = "clownfish";
     GLfloat scale = 7.0;
-    unsigned n = 15;
+    unsigned n = 30;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {

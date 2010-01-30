@@ -86,9 +86,14 @@ class Fish
             pos[2] += len * cos(vAngle)*sin(hAngle);
         }
 
+        void undoSwim()
+        {
+            std::copy(oldPos, oldPos + 3, pos);
+        }
+
     private:
         const Model *model;
-        GLfloat pos[3], hAngle, vAngle, scale;
+        GLfloat pos[3], oldPos[3], hAngle, vAngle, scale;
         State state;
 };
 

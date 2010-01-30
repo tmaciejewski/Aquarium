@@ -148,6 +148,7 @@ void Aquarium::update()
         (*it)->update();
         if (collides(*it))
         {
+            (*it)->undoSwim();
             (*it)->setState(Fish::S_COLLISION);
         }
         else
