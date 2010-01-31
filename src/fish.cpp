@@ -20,12 +20,13 @@
 
 #include "fish.hpp"
 
-Fish::Fish(const Model *m, GLfloat s) : model(m), scale(s), state(S_MOVING)
+Fish::Fish(const Model *m, GLfloat s)
+    : model(m), swimLen(0.0), scale(s), state(S_MOVING), lastState(state)
 {
     pos[0] = pos[1] = pos[2] = 0.0;
     oldPos[0] = oldPos[1] = oldPos[2] = 0.0;
-    hAngle = 2 * M_PI * (rand() / (float) RAND_MAX - 0.5);
-    vAngle = M_PI_2 * (rand() / (float) RAND_MAX - 0.5);
+    angle[0] = 2 * M_PI * (rand() / (float) RAND_MAX - 0.5);
+    angle[1] = M_PI_2 * (rand() / (float) RAND_MAX - 0.5);
 }
 
 Fish::~Fish()
@@ -37,8 +38,8 @@ void Fish::display() const
 {
     glPushMatrix();
     glTranslatef(pos[0], pos[1], pos[2]);
-    glRotatef(hAngle * (180.0 / M_PI), 0.0, 1.0, 0.0);
-    glRotatef(-vAngle * (180.0 / M_PI), 0.0, 0.0, 1.0);
+    glRotatef(angle[0] * (180.0 / M_PI), 0.0, 1.0, 0.0);
+    glRotatef(-angle[1] * (180.0 / M_PI), 0.0, 0.0, 1.0);
     if (model)
         model->display(scale);
     glPopMatrix();
@@ -46,35 +47,31 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.5, turnSpeed = speed / 5.0;
-    static GLfloat len, turn[2];
-    static short direction[2];
-    static State lastState = state;
+    static GLfloat speed = 0.15, turnSpeed = speed / 5.0;
 
-    std::copy(pos, pos + 3, oldPos);
-
-    if (len <= 0)
+    if (swimLen <= 0)
     {
-        state = S_MOVING;
-        len = 1.0 + 10.0 * (rand() / (float) RAND_MAX);
-        turn[0] = M_PI * (rand() / (float) RAND_MAX);
-        turn[1] = M_PI_4 * (rand() / (float) RAND_MAX);
-        direction[0] = rand() % 3 - 1;
-        direction[1] = rand() % 3 - 1;
+        swimLen = 1.0 + 10.0 * (rand() / (float) RAND_MAX);
+        nextAngle[0] = 2 * M_PI * (rand() / (float) RAND_MAX - 0.5);
+        nextAngle[1] = M_PI_2 * (rand() / (float) RAND_MAX - 0.5);
     }
 
     if (state == S_MOVING)
     {
-        len -= speed;
+        GLfloat delta[] = {angle[0] - nextAngle[0], angle[1] - nextAngle[1]};
+        swimLen -= speed;
 
-        turn[0] -= turnSpeed;
-        turn[1] -= turnSpeed;
+        for (int i = 0; i < 2; ++i)
+        {
+            GLfloat delta = angle[i] - nextAngle[i];
 
-        if (turn[0] > 0)
-            hAngle += direction[0] * turnSpeed;
-
-        if (turn[1] > 0)
-            vAngle += direction[1] * turnSpeed;
+            if (delta > turnSpeed)
+                angle[i] -= turnSpeed;
+            else if (delta < -turnSpeed)
+                angle[i] += turnSpeed;
+            else
+                angle[i] = nextAngle[i];
+        }
 
         swim(speed);
     }
@@ -82,14 +79,15 @@ void Fish::update()
     {
         if (lastState != state)
         {
-            hAngle = hAngle + M_PI;
-            vAngle = -vAngle;
+            nextAngle[0] = angle[0] = angle[0] + M_PI;
+            nextAngle[1] = angle[1] = -angle[1];
         }
 
         swim(speed);
     }
 
     lastState = state;
+    std::copy(pos, pos + 3, oldPos);
 }
 
 bool Fish::collides(const Fish *f) const

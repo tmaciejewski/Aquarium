@@ -75,15 +75,15 @@ class Fish
 
         void turn(GLfloat h, GLfloat v)
         {
-            hAngle += h;
-            vAngle += v;
+            angle[0] += h;
+            angle[1] += v;
         }
 
         void swim(GLfloat len = 1.0)
         {
-            pos[1] += len * sin(vAngle);
-            pos[0] -= len * cos(vAngle)*cos(hAngle);
-            pos[2] += len * cos(vAngle)*sin(hAngle);
+            pos[1] += len * sin(angle[1]);
+            pos[0] -= len * cos(angle[1])*cos(angle[0]);
+            pos[2] += len * cos(angle[1])*sin(angle[0]);
         }
 
         void undoSwim()
@@ -93,8 +93,8 @@ class Fish
 
     private:
         const Model *model;
-        GLfloat pos[3], oldPos[3], hAngle, vAngle, scale;
-        State state;
+        GLfloat pos[3], oldPos[3], angle[2], swimLen, nextAngle[2], scale;
+        State state, lastState;
 };
 
 #endif /* FISH_HPP */

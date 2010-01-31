@@ -29,8 +29,8 @@
 class Aquarium
 {
     public:
-        Aquarium(GLuint width = 50.0, GLuint height = 30.0,
-                   GLuint depth = 20.0);
+        Aquarium(GLuint width = 50.0, GLuint height = 50.0,
+                   GLuint depth = 50.0);
         virtual ~Aquarium();
 
         void display() const;
@@ -38,6 +38,10 @@ class Aquarium
 
         bool addFish(const Model *model, GLfloat scale = 1.0);
         void addFish(Fish *f);
+        bool removeFish(unsigned int n = 1)
+        {
+            fish.erase(fish.end() - n, fish.end());
+        }
 
         void init();
 

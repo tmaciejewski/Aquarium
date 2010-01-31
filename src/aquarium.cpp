@@ -175,7 +175,6 @@ bool Aquarium::collides(const Fish *f) const
                 y >= size[1] / 2.0 || y <= -size[1] / 2.0 ||
                 z >= size[2] / 2.0 || z <= -size[2] / 2.0)
             {
-                std::cout << "Out of the aquarium\n";
                 return true;
             }
         }
