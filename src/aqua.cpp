@@ -35,7 +35,7 @@ unsigned width = 640, height = 480;
 
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting = false, gamePause = false;
+bool lighting = false, gamePause = true;
 GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
 
 class Camera
