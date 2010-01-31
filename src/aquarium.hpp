@@ -34,12 +34,15 @@ class Aquarium
         virtual ~Aquarium();
 
         void display() const;
-        void update();
+        void update(bool collisions = true);
 
         bool addFish(const Model *model, GLfloat scale = 1.0);
         void addFish(Fish *f);
         bool removeFish(unsigned int n = 1)
         {
+            if (fish.size() < n)
+                n = fish.size();
+
             fish.erase(fish.end() - n, fish.end());
         }
 
@@ -53,7 +56,7 @@ class Aquarium
 
         void textureFromImg(GLuint t, const char *filename);
         void displayAquarium() const;
-        bool collides(const Fish *f) const;
+        bool collides(const Fish *f, bool collisions = true) const;
         void initShader();
         void displaySquare(GLfloat width, GLfloat height) const;
 };

@@ -139,14 +139,13 @@ void Aquarium::displayAquarium() const
     glPopMatrix();
 }
 
-void Aquarium::update()
+void Aquarium::update(bool collisions)
 {
-
     for(std::vector<Fish*>::iterator it = fish.begin();
         it != fish.end(); ++it)
     {
         (*it)->update();
-        if (collides(*it))
+        if (collides(*it, collisions))
         {
             (*it)->undoSwim();
             (*it)->setState(Fish::S_COLLISION);
@@ -158,7 +157,7 @@ void Aquarium::update()
     }
 }
 
-bool Aquarium::collides(const Fish *f) const
+bool Aquarium::collides(const Fish *f, bool collisions) const
 {
     if (f && f->getModel())
     {
@@ -179,11 +178,14 @@ bool Aquarium::collides(const Fish *f) const
             }
         }
 
-        for(std::vector<Fish*>::const_iterator it = fish.begin();
-            it != fish.end(); ++it)
+        if (collisions)
         {
-            if (*it != f && f->collides(*it))
-                return true;
+            for(std::vector<Fish*>::const_iterator it = fish.begin();
+                it != fish.end(); ++it)
+            {
+                if (*it != f && f->collides(*it))
+                    return true;
+            }
         }
     }
 

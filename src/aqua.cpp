@@ -35,8 +35,10 @@ unsigned width = 640, height = 480;
 
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting = false, gamePause = true;
+bool lighting = false, gamePause = false, collisions = true;
 GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
+std::string model = "clownfish";
+GLfloat scale = 7.0;
 
 class Camera
 {
@@ -109,7 +111,7 @@ void resize(int w, int h)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0, width/height, 0.01, 100.0);
+    gluPerspective(60.0, width/height, 0.01, 1000.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -175,13 +177,31 @@ void keyboard()
         gamePause = !gamePause;
         keyPressed['p'] = false;
     }
+
+    if (keyPressed['c'])
+    {
+        collisions = !collisions;
+        keyPressed['c'] = false;
+    }
+
+    if (keyPressed['='])
+    {
+        aquarium.addFish(modelLib[model], scale);
+        keyPressed['='] = false;
+    }
+
+    if (keyPressed['-'])
+    {
+        aquarium.removeFish(5);
+        keyPressed['-'] = false;
+    }
 }
 
 void update()
 {
     keyboard();
     if (!gamePause)
-        aquarium.update();
+        aquarium.update(collisions);
 }
 
 void run()
@@ -232,8 +252,6 @@ void run()
 
 int main(int argc, char **argv)
 {
-    std::string model = "clownfish";
-    GLfloat scale = 7.0;
     unsigned n = 30;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
