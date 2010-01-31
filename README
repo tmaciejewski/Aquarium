@@ -1,14 +1,41 @@
 === Installation ===
 
-Dependency: SDL, SDL_Image
+Dependency: SDL, SDL_Image, Boost.Filesystem
 
 ./configure
 make
 make install
 
+=== Running ===
+
+aqua [n] [model] [scale]
+
+Optional arguments:
+n - number of fish (default 30)
+model - name of the OBJ file (without extension)
+scale - scale of the models
+
+Program searches for models recursively in current directory.
+
+Predefined models:
+* clownfish
+* goldenfish
+
 === Keyboard ===
-g - load goldfish model
-c - load clownfish model
-l - turn on/off lighting
+
 1 - set normal rendering
 2 - set wireframe
+= - add 1 fish
+- - remove 5 fish
+c - switch collision detection
+left/right - camera strafing
+up/down - camera forward/backward
+pgup/pgdown - fly up/down
+
+
+=== Mouse ===
+
+XAxis - horizontal angle (-360 to 360)
+YAxis - vertival anble (-90 to 90)
+Left button - capture mouse pointer
+Right button - release mouse pointer
