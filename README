@@ -1,6 +1,6 @@
 === Installation ===
 
-Dependency: SDL, SDL_Image, Boost.Filesystem
+Dependency: SDL, SDL_Image (>= 1.2), Boost.Filesystem (>= 1.36)
 
 ./configure
 make
