@@ -20,6 +20,7 @@
 
 #include "modellib.hpp"
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/exception.hpp>
 #include <iostream>
 
 ModelLib::ModelLib()
@@ -46,16 +47,24 @@ void ModelLib::loadLib(const char *p)
         return;
     }
     fs::recursive_directory_iterator it(path), end;
-    while (it != end)
+
+    try
     {
-        if (fs::is_regular(it->status()) && it->path().extension() == ".obj")
+        while (it != end)
         {
-            Model *m = new Model();
-            std::string modelPath = it->path().parent_path().directory_string();
-            std::string modelName = it->path().stem();
-            m->loadObj(modelPath.c_str(), modelName.c_str());
-            model[modelName] = m;
+            if (fs::is_regular(it->status()) && it->path().extension() == ".obj")
+            {
+                Model *m = new Model();
+                std::string modelPath = it->path().parent_path().directory_string();
+                std::string modelName = it->path().stem();
+                m->loadObj(modelPath.c_str(), modelName.c_str());
+                model[modelName] = m;
+            }
+            ++it;
         }
-        ++it;
+    }
+    catch (const fs::filesystem_error &e)
+    {
+        std::cout << "Error: " << e.what() << '\n';
     }
 }
