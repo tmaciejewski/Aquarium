@@ -51,7 +51,7 @@ class Aquarium
     private:
         std::vector<Fish *> fish;
         GLfloat size[3];
-        GLint timeLocation;
+        GLint timeLocation, xLocation;
         GLuint program, texture[3];
 
         void textureFromImg(GLuint t, const char *filename);

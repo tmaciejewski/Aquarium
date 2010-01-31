@@ -77,6 +77,7 @@ void Aquarium::display() const
     for(std::vector<Fish*>::const_iterator it = fish.begin();
         it != fish.end(); ++it)
     {
+        glUniform1f(xLocation, (*it)->getModel()->getCenter(0));
         (*it)->display();
     }
 
@@ -238,13 +239,16 @@ void printProgramInfoLog(GLuint obj)
 
 void Aquarium::initShader()
 {
-    const GLchar *vsSource[] = {"uniform float time;\n"
+    const GLchar *vsSource[] = {"uniform float time, x;\n"
                       "varying vec3 normal;"
                       "void main(void)\n"
                       "{\n"
                         "normal = gl_NormalMatrix * gl_Normal;\n"
                         "vec4 v = vec4(gl_Vertex);\n"
-                        "v.z = v.z + 0.02 * cos(15.0 * v.x + 2.0 * time);\n"
+                        "if (v.x > x)\n"
+                        "{\n"
+                        "v.z += 0.3 * (v.x - x) * sin(3.0 * time);\n"
+                        "}\n"
                         "gl_Position = gl_ModelViewProjectionMatrix * v;\n"
                         "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
                       "}"};
@@ -274,5 +278,6 @@ void Aquarium::initShader()
 
     glUseProgram(program);
     timeLocation = glGetUniformLocation(program, "time");
+    xLocation = glGetUniformLocation(program, "x");
     glUseProgram(0);
 }
