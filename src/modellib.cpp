@@ -20,7 +20,6 @@
 
 #include "modellib.hpp"
 #include <boost/filesystem.hpp>
-#include <boost/filesystem/exception.hpp>
 #include <iostream>
 
 ModelLib::ModelLib()

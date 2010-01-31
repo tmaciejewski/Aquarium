@@ -289,10 +289,8 @@ int main(int argc, char **argv)
         scale = atof(argv[3]);
     }
 
-    for (int i = 0; i < n; ++i)
-    {
-        aquarium.addFish(modelLib[model], scale);
-    }
+    while (n > 0 && aquarium.addFish(modelLib[model], scale))
+        --n;
 
     run();
 
