@@ -167,7 +167,10 @@ void keyboard()
             camera.vAngle = tmpAngle;
         }
         else if (activeFish > 0)
+        {
             --activeFish;
+            keyPressed[SDLK_LEFT] = false;
+        }
     }
 
     if (keyPressed[SDLK_RIGHT])
@@ -182,7 +185,10 @@ void keyboard()
             camera.vAngle = tmpAngle;
         }
         else
+        {
             ++activeFish;
+            keyPressed[SDLK_RIGHT] = false;
+        }
     }
 
     if (keyPressed[SDLK_PAGEUP])

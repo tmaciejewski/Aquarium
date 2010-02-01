@@ -69,6 +69,7 @@ class Aquarium
         void displayAquarium() const;
         bool collides(const Fish *f, bool collisions = true) const;
         void initShader();
+        void loadShader(const char *name, std::string &s) const;
         void displaySquare(GLfloat width, GLfloat height) const;
 };
 

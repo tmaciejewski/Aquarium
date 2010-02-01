@@ -241,33 +241,31 @@ void printProgramInfoLog(GLuint obj)
     }
 }
 
+void Aquarium::loadShader(const char *name, std::string &s) const
+{
+    std::ifstream f(name);
+    std::string line;
+
+    while (std::getline(f, line))
+    {
+        s += line + '\n';
+    }
+}
+
 void Aquarium::initShader()
 {
-    const GLchar *vsSource[] = {"uniform float time, x;\n"
-                      "varying vec3 normal;"
-                      "void main(void)\n"
-                      "{\n"
-                        "normal = gl_NormalMatrix * gl_Normal;\n"
-                        "vec4 v = vec4(gl_Vertex);\n"
-                        "if (v.x > x)\n"
-                        "{\n"
-                        "v.z += 0.3 * (v.x - x) * sin(3.0 * time);\n"
-                        "}\n"
-                        "gl_Position = gl_ModelViewProjectionMatrix * v;\n"
-                        "gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-                      "}"};
+    std::string vsSource, fsSource;
 
-    const GLchar *fsSource[] = {"uniform sampler2D tex;\n"
-                                 "varying vec3 normal;\n"
-                                "void main()\n{\n"
-                                "gl_FragColor = texture2D(tex,gl_TexCoord[0].st);\n"
-                             "}"};
+    loadShader(DATADIR "/shaders/fish.vert", vsSource);
+    loadShader(DATADIR "/shaders/fish.frag", fsSource);
+
+    const char *shaders[] = {vsSource.c_str(), fsSource.c_str()};
 
     GLuint vertexShader   = glCreateShader(GL_VERTEX_SHADER),
            fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-    glShaderSource(vertexShader, 1, vsSource, NULL);
-    glShaderSource(fragmentShader, 1, fsSource, NULL);
+    glShaderSource(vertexShader, 1, shaders, NULL);
+    glShaderSource(fragmentShader, 1, shaders + 1, NULL);
 
     glCompileShader(vertexShader);
     glCompileShader(fragmentShader);
