@@ -29,8 +29,8 @@
 class Aquarium
 {
     public:
-        Aquarium(GLuint width = 50.0, GLuint height = 50.0,
-                   GLuint depth = 50.0);
+        Aquarium(GLuint width = 10.0, GLuint height = 10.0,
+                   GLuint depth = 10.0);
         virtual ~Aquarium();
 
         void display() const;
@@ -53,8 +53,14 @@ class Aquarium
             return fish[n % fish.size()];
         }
 
+        void setActive(int n = -1)
+        {
+            activeFish = n;
+        }
+
     private:
         std::vector<Fish *> fish;
+        int activeFish;
         GLfloat size[3];
         GLint timeLocation, xLocation;
         GLuint program, texture[3];

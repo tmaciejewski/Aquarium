@@ -31,14 +31,15 @@
 
 ModelLib modelLib;
 Aquarium aquarium;
-unsigned width = 640, height = 480;
+unsigned width = 800, height = 600;
 
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting = false, gamePause = false, collisions = true;
+bool lighting = false, gamePause = false, collisions = true, FPP;
+unsigned activeFish;
 GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
 std::string model = "clownfish";
-GLfloat scale = 7.0;
+GLfloat scale = 1.0;
 
 class Camera
 {
@@ -51,19 +52,22 @@ class Camera
 
         void set(const Fish *f = NULL)
         {
-            GLfloat tx = x, ty = y, tz = z;
-            glRotatef(-vAngle * (180.0 / M_PI), 1.0, 0.0, 0.0);
-            glRotatef(hAngle * (180.0 / M_PI), 0.0, 1.0, 0.0);
+            GLfloat tx = x, ty = y, tz = z, va = vAngle, ha = hAngle;
 
             if (f)
             {
-                const GLfloat *coord = f->getXYZ();
+                const GLfloat *coord = f->getXYZ(), *angle = f->getAngle();
 
                 tx = coord[0];
                 ty = coord[1];
                 tz = coord[2];
+
+                va = angle[1];
+                ha = -angle[0] -M_PI_2;
             }
 
+            glRotatef(-va * (180.0 / M_PI), 1.0, 0.0, 0.0);
+            glRotatef(ha * (180.0 / M_PI), 0.0, 1.0, 0.0);
             glTranslatef(-tx, -ty, -tz);
         }
 
@@ -96,8 +100,17 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    //camera.set(aquarium.getFish(0));
-    camera.set();
+    if (FPP)
+    {
+        aquarium.setActive(activeFish);
+        camera.set(aquarium.getFish(activeFish));
+    }
+    else
+    {
+        aquarium.setActive();
+        camera.set();
+    }
+
     aquarium.display();
 
     SDL_GL_SwapBuffers();
@@ -144,22 +157,32 @@ void keyboard()
 
     if (keyPressed[SDLK_LEFT])
     {
-        GLfloat tmpAngle = camera.vAngle;
-        camera.vAngle = 0.0;
-        camera.hAngle -= M_PI_2;
-        camera.move();
-        camera.hAngle += M_PI_2;
-        camera.vAngle = tmpAngle;
+        if (!FPP)
+        {
+            GLfloat tmpAngle = camera.vAngle;
+            camera.vAngle = 0.0;
+            camera.hAngle -= M_PI_2;
+            camera.move();
+            camera.hAngle += M_PI_2;
+            camera.vAngle = tmpAngle;
+        }
+        else if (activeFish > 0)
+            --activeFish;
     }
 
     if (keyPressed[SDLK_RIGHT])
     {
-        GLfloat tmpAngle = camera.vAngle;
-        camera.vAngle = 0.0;
-        camera.hAngle += M_PI_2;
-        camera.move();
-        camera.hAngle -= M_PI_2;
-        camera.vAngle = tmpAngle;
+        if (!FPP)
+        {
+            GLfloat tmpAngle = camera.vAngle;
+            camera.vAngle = 0.0;
+            camera.hAngle += M_PI_2;
+            camera.move();
+            camera.hAngle -= M_PI_2;
+            camera.vAngle = tmpAngle;
+        }
+        else
+            ++activeFish;
     }
 
     if (keyPressed[SDLK_PAGEUP])
@@ -206,6 +229,12 @@ void keyboard()
     {
         aquarium.removeFish(5);
         keyPressed['-'] = false;
+    }
+
+    if (keyPressed[SDLK_TAB])
+    {
+        FPP = !FPP;
+        keyPressed[SDLK_TAB] = false;
     }
 }
 
@@ -279,7 +308,7 @@ int main(int argc, char **argv)
     SDL_WM_SetCaption(PACKAGE_STRING, NULL);
 
     initGL();
-    resize(640, 480);
+    resize(width, height);
 
     modelLib.loadLib(DATADIR);
     modelLib.loadLib(".");

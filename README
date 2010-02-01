@@ -23,14 +23,15 @@ Predefined models:
 
 === Keyboard ===
 
-1 - set normal rendering
-2 - set wireframe
-= - add 1 fish
-- - remove 5 fish
-c - switch collision detection
-left/right - camera strafing
-up/down - camera forward/backward
-pgup/pgdown - fly up/down
+1  - set normal rendering
+2  - set wireframe
+=  - add 1 fish
+-  - remove 5 fish
+c  - switch collision detection
+left/right  - camera strafing or switching fish in FPP view
+up/down  - camera forward/backward
+pgup/pgdown  - fly camera up/down
+TAB - switch between FPP view and free camera
 
 
 === Mouse ===

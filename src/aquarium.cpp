@@ -21,6 +21,7 @@
 #include "aquarium.hpp"
 
 Aquarium::Aquarium(GLuint width, GLuint height, GLuint depth)
+    : activeFish(-1)
 {
     srand(time(0));
     size[0] = width;
@@ -77,8 +78,11 @@ void Aquarium::display() const
     for(std::vector<Fish*>::const_iterator it = fish.begin();
         it != fish.end(); ++it)
     {
-        glUniform1f(xLocation, (*it)->getModel()->getCenter(0));
-        (*it)->display();
+        if (*it != getFish(activeFish))
+        {
+            glUniform1f(xLocation, (*it)->getModel()->getCenter(0));
+            (*it)->display();
+        }
     }
 
     t += 0.1;

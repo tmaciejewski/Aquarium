@@ -73,6 +73,11 @@ class Fish
             return pos;
         }
 
+        const GLfloat *getAngle() const
+        {
+            return angle;
+        }
+
         void turn(GLfloat h, GLfloat v)
         {
             angle[0] += h;
