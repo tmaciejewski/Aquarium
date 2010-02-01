@@ -47,23 +47,27 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.15, turnSpeed = speed / 5.0;
+    static GLfloat speed = 0.15, turnSpeed = speed;
 
     if (swimLen <= 0)
     {
-        swimLen = 1.0 + 10.0 * (rand() / (float) RAND_MAX);
+        swimLen = 3.0 + 10.0 * (rand() / (float) RAND_MAX);
         nextAngle[0] = 2 * M_PI * (rand() / (float) RAND_MAX - 0.5);
         nextAngle[1] = M_PI_2 * (rand() / (float) RAND_MAX - 0.5);
     }
 
     if (state == S_MOVING)
     {
-        GLfloat delta[] = {angle[0] - nextAngle[0], angle[1] - nextAngle[1]};
         swimLen -= speed;
 
         for (int i = 0; i < 2; ++i)
         {
             GLfloat delta = angle[i] - nextAngle[i];
+
+            if (delta > M_PI)
+                delta = delta - 2 * M_PI;
+            else if (delta < -M_PI)
+                delta = delta + 2 * M_PI;
 
             if (delta > turnSpeed)
                 angle[i] -= turnSpeed;
@@ -71,6 +75,11 @@ void Fish::update()
                 angle[i] += turnSpeed;
             else
                 angle[i] = nextAngle[i];
+
+            if (angle[i] > M_PI)
+                angle[i] -= 2 * M_PI;
+            else if (angle[i] < -M_PI)
+                angle[i] += 2 * M_PI;
         }
 
         swim(speed);
@@ -81,6 +90,7 @@ void Fish::update()
         {
             nextAngle[0] = angle[0] = angle[0] + M_PI;
             nextAngle[1] = angle[1] = -angle[1];
+            swimLen += 2.0;
         }
 
         swim(speed);
