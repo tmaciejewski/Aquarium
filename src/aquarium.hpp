@@ -48,6 +48,11 @@ class Aquarium
 
         void init();
 
+        const Fish *getFish(unsigned n) const
+        {
+            return fish[n % fish.size()];
+        }
+
     private:
         std::vector<Fish *> fish;
         GLfloat size[3];

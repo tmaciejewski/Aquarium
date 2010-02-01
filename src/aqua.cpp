@@ -49,11 +49,22 @@ class Camera
         {
         }
 
-        void set()
+        void set(const Fish *f = NULL)
         {
+            GLfloat tx = x, ty = y, tz = z;
             glRotatef(-vAngle * (180.0 / M_PI), 1.0, 0.0, 0.0);
             glRotatef(hAngle * (180.0 / M_PI), 0.0, 1.0, 0.0);
-            glTranslatef(-x, -y, -z);
+
+            if (f)
+            {
+                const GLfloat *coord = f->getXYZ();
+
+                tx = coord[0];
+                ty = coord[1];
+                tz = coord[2];
+            }
+
+            glTranslatef(-tx, -ty, -tz);
         }
 
         void move(GLfloat len = 0.5)
@@ -85,6 +96,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    //camera.set(aquarium.getFish(0));
     camera.set();
     aquarium.display();
 

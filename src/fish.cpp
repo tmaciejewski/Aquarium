@@ -47,11 +47,11 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.15, turnSpeed = speed;
+    static GLfloat speed = 0.07 * sqrt(scale), turnSpeed = speed;
 
     if (swimLen <= 0)
     {
-        swimLen = 3.0 + 10.0 * (rand() / (float) RAND_MAX);
+        swimLen = 3.0 + 120.0 * speed * (rand() / (float) RAND_MAX);
         nextAngle[0] = 2 * M_PI * (rand() / (float) RAND_MAX - 0.5);
         nextAngle[1] = M_PI_2 * (rand() / (float) RAND_MAX - 0.5);
     }
