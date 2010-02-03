@@ -6,6 +6,7 @@ Dependency: SDL, SDL_Image (>= 1.2), Boost.Filesystem (>= 1.36)
 make
 make install
 
+
 === Running ===
 
 aqua [n] [model] [scale]
@@ -21,13 +22,16 @@ Predefined models:
 * clownfish
 * goldenfish
 
+
 === Keyboard ===
 
 1  - set normal rendering
 2  - set wireframe
 =  - add 1 fish
 -  - remove 5 fish
-c  - switch collision detection
+c  - turn off/on collision detection
+t  - turn off/on lighting
+l -  turn on/off textures
 left/right  - camera strafing or switching fish in FPP view
 up/down  - camera forward/backward
 pgup/pgdown  - fly camera up/down
