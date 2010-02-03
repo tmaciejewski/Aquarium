@@ -4348,7 +4348,7 @@ fi
 
 # Checks for library functions.
 
-ac_config_files="$ac_config_files Makefile data/Makefile data/clownfish/Makefile data/goldenfish/Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile data/Makefile data/clownfish/Makefile data/goldenfish/Makefile data/shaders/Makefile src/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5070,6 +5070,7 @@ do
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "data/clownfish/Makefile") CONFIG_FILES="$CONFIG_FILES data/clownfish/Makefile" ;;
     "data/goldenfish/Makefile") CONFIG_FILES="$CONFIG_FILES data/goldenfish/Makefile" ;;
+    "data/shaders/Makefile") CONFIG_FILES="$CONFIG_FILES data/shaders/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

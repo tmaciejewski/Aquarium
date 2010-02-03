@@ -35,9 +35,8 @@ unsigned width = 800, height = 600;
 
 std::vector<bool> keyPressed(SDLK_LAST);
 SDL_Surface *surface;
-bool lighting = false, gamePause = false, collisions = true, FPP;
+bool gamePause, collisions = true, FPP;
 unsigned activeFish;
-GLfloat light_position[] = {0.0, 0.0, 15.0, 1.0};
 std::string model = "clownfish";
 GLfloat scale = 1.0;
 
@@ -71,7 +70,7 @@ class Camera
             glTranslatef(-tx, -ty, -tz);
         }
 
-        void move(GLfloat len = 0.5)
+        void move(GLfloat len = 0.1)
         {
             y += len * sin(vAngle);
             x += len * cos(vAngle)*sin(hAngle);
@@ -123,6 +122,23 @@ void initGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHT0);
+
+
+    GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1.0};
+    GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+
+    //glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.05);
+    //glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.1);
+
+    GLfloat mat_ambient[] = {0.5, 0.5, 0.5, 1.0};
+    GLfloat mat_diffuse[] = {0.9, 0.9, 0.9, 1.0};
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glShadeModel(GL_SMOOTH);
@@ -151,8 +167,28 @@ void keyboard()
 
     if(keyPressed['l'])
     {
+        GLboolean lighting;
+        glGetBooleanv(GL_LIGHTING, &lighting);
         lighting = !lighting;
+        if (lighting)
+            glEnable(GL_LIGHTING);
+        else
+            glDisable(GL_LIGHTING);
+
         keyPressed['l'] = false;
+    }
+
+    if(keyPressed['t'])
+    {
+        GLboolean textures;
+        glGetBooleanv(GL_TEXTURE_2D, &textures);
+        textures = !textures;
+        if (textures)
+            glEnable(GL_TEXTURE_2D);
+        else
+            glDisable(GL_TEXTURE_2D);
+
+        keyPressed['t'] = false;
     }
 
     if (keyPressed[SDLK_LEFT])
@@ -208,10 +244,16 @@ void keyboard()
     }
 
     if (keyPressed[SDLK_UP])
-        camera.move(0.5);
+        camera.move();
 
     if (keyPressed[SDLK_DOWN])
-        camera.move(-.5);
+    {
+        camera.hAngle += M_PI;
+        camera.vAngle = -camera.vAngle;
+        camera.move();
+        camera.hAngle -= M_PI;
+        camera.vAngle = -camera.vAngle;
+    }
 
     if (keyPressed['p'])
     {

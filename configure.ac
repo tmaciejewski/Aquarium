@@ -26,5 +26,6 @@ AC_CONFIG_FILES([Makefile
                  data/Makefile
                  data/clownfish/Makefile
                  data/goldenfish/Makefile
+                 data/shaders/Makefile
                  src/Makefile])
 AC_OUTPUT

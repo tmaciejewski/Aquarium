@@ -70,11 +70,21 @@ void Aquarium::init()
 void Aquarium::display() const
 {
     static GLfloat t = 0.0;
+    GLfloat light_position[] = {0.0, 0.0, 0.0, 1.0};
+    GLboolean lighting, textures;
+
+    glGetBooleanv(GL_LIGHTING, &lighting);
+    glGetBooleanv(GL_TEXTURE_2D, &textures);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     displayAquarium();
 
     glUseProgram(program);
     glUniform1f(timeLocation, t);
+    glUniform1i(lightingLocation, lighting);
+    glUniform1i(texturesLocation, textures);
+
     for(std::vector<Fish*>::const_iterator it = fish.begin();
         it != fish.end(); ++it)
     {
@@ -95,12 +105,25 @@ void Aquarium::display() const
 void Aquarium::displaySquare(GLfloat width, GLfloat height) const
 {
     GLfloat u = 1.0, v = 1.0;
+
     glScalef(width / 2.0, height / 2.0, 1.0);
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0, v); glVertex3f(1.0, -1.0, 0.0);
-    glTexCoord2f(0.0, 0.0); glVertex3f(1.0, 1.0, 0.0);
-    glTexCoord2f(u, 0.0); glVertex3f(-1.0, 1.0, 0.0);
-    glTexCoord2f(u, v); glVertex3f(-1.0, -1.0, 0.0);
+
+    glNormal3f(0.0, 0.0, 1.0);
+    glTexCoord2f(0.0, v);
+    glVertex3f(1.0, -1.0, 0.0);
+
+    //glNormal3f(0.0, 0.0, 1.0);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(1.0, 1.0, 0.0);
+
+    //glNormal3f(0.0, 0.0, 1.0);
+    glTexCoord2f(u, 0.0);
+    glVertex3f(-1.0, 1.0, 0.0);
+
+    //glNormal3f(0.0, 0.0, 1.0);
+    glTexCoord2f(u, v);
+    glVertex3f(-1.0, -1.0, 0.0);
     glEnd();
 }
 
@@ -281,5 +304,7 @@ void Aquarium::initShader()
     glUseProgram(program);
     timeLocation = glGetUniformLocation(program, "time");
     xLocation = glGetUniformLocation(program, "x");
+    lightingLocation = glGetUniformLocation(program, "lighting");
+    texturesLocation = glGetUniformLocation(program, "textures");
     glUseProgram(0);
 }

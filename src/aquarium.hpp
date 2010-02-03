@@ -29,8 +29,8 @@
 class Aquarium
 {
     public:
-        Aquarium(GLuint width = 10.0, GLuint height = 10.0,
-                   GLuint depth = 10.0);
+        Aquarium(GLuint width = 5.0, GLuint height = 5.0,
+                   GLuint depth = 5.0);
         virtual ~Aquarium();
 
         void display() const;
@@ -38,7 +38,7 @@ class Aquarium
 
         bool addFish(const Model *model, GLfloat scale = 1.0);
         void addFish(Fish *f);
-        bool removeFish(unsigned int n = 1)
+        void removeFish(unsigned int n = 1)
         {
             if (fish.size() < n)
                 n = fish.size();
@@ -62,7 +62,7 @@ class Aquarium
         std::vector<Fish *> fish;
         int activeFish;
         GLfloat size[3];
-        GLint timeLocation, xLocation;
+        GLint timeLocation, xLocation, lightingLocation, texturesLocation;
         GLuint program, texture[3];
 
         void textureFromImg(GLuint t, const char *filename);
