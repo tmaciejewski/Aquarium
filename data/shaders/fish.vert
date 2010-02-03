@@ -1,5 +1,5 @@
 uniform float time, x;
-varying vec3 normal, lightDir;
+varying vec3 normal;
 
 void main(void)
 {
