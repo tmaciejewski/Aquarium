@@ -78,12 +78,6 @@ class Fish
             return angle;
         }
 
-        void turn(GLfloat h, GLfloat v)
-        {
-            angle[0] += h;
-            angle[1] += v;
-        }
-
         void swim(GLfloat len = 1.0)
         {
             pos[1] += len * sin(angle[1]);
