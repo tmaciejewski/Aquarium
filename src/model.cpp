@@ -440,15 +440,3 @@ void Model::loadTexture(const std::string &texname)
         }
     }
 }
-
-void Model::normalize()
-{
-    for (std::vector<Buffer>::const_iterator it = buffer.begin();
-        it != buffer.end(); ++it)
-    {
-        for (int i = 0; i < it->count; i += 8)
-        {
-
-        }
-    }
-}

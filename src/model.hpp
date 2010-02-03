@@ -60,7 +60,7 @@ class Model
             size_t count;
             std::string material;
 
-            Buffer() : vertices(NULL), mode(GL_TRIANGLES) {}
+            Buffer() : mode(GL_TRIANGLES), vertices(NULL) {}
             void clear() { if (vertices) delete[] vertices; }
         };
 
@@ -85,8 +85,6 @@ class Model
         void addBuffer(const std::vector<GLfloat> &buf,
             const size_t count, std::string mtl);
         void useMaterial(const std::string &mtl) const;
-        void normalize();
-
 };
 
 #endif /* MODEL_H */

@@ -105,8 +105,8 @@ bool Fish::collides(const Fish *f) const
     {
         for (int i = 0; i < 3; ++i)
         {
-            GLfloat dist = pos[i] + model->getCenter(i)
-                            - f->model->getCenter(i) - f->pos[i];
+            GLfloat dist = pos[i] + scale * model->getCenter(i)
+                            - f->scale * f->model->getCenter(i) - f->pos[i];
             if (dist < 0)
                 dist = -dist;
 
