@@ -1,33 +1,41 @@
 uniform sampler2D tex;
 uniform bool textures, lighting;
-varying vec3 normal, lightDir;
+varying vec3 normal;
 
 void main()
 {
-    vec3 ct,cf;
-    vec4 texel;
-    float intensity,at,af;
+    vec4 cf, ct;
+    vec4 diffuse, ambient;
+    float intensity;
 
     if (lighting)
-        intensity = max(dot(lightDir,normalize(normal)), 0.0);
+    {
+        vec4 position = gl_ModelViewMatrix * vec4(0.0);
+        intensity = dot(vec3(gl_LightSource[0].position), normalize(normal));
+
+        if (intensity > 1.0)
+            intensity = 1.0;
+
+        diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
+        ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
+    }
     else
+    {
+        diffuse = gl_FrontMaterial.diffuse;
+        ambient = gl_FrontMaterial.ambient;
         intensity = 1.0;
+    }
 
-    cf = intensity * (gl_FrontMaterial.diffuse).rgb +
-                      gl_FrontMaterial.ambient.rgb;
-    af = gl_FrontMaterial.diffuse.a;
+    cf = intensity * diffuse + ambient;
 
-    if (textures)
+    if (textures && textureSize(tex, 0) != ivec2(0, 0))
     {
-        texel = texture2D(tex,gl_TexCoord[0].st);
-        ct = texel.rgb;
-        at = texel.a;
+        ct = texture2D(tex, gl_TexCoord[0].st);
     }
     else
     {
-        ct = vec3(1.0, 1.0, 1.0);
-        at = 1.0;
+        ct = vec4(1.0);
     }
 
-    gl_FragColor = vec4(ct * cf, at * af);
+    gl_FragColor = ct * cf;
 }

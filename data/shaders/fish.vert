@@ -4,7 +4,6 @@ varying vec3 normal, lightDir;
 void main(void)
 {
     normal = normalize(gl_NormalMatrix * gl_Normal);
-    lightDir = normalize(vec3(gl_LightSource[0].position));
     gl_TexCoord[0] = gl_MultiTexCoord0;
 
     vec4 v = vec4(gl_Vertex);
