@@ -50,7 +50,10 @@ class Aquarium
 
         const Fish *getFish(unsigned n) const
         {
-            return fish[n % fish.size()];
+            if (fish.size() > 0)
+                return fish[n % fish.size()];
+            else
+                return NULL;
         }
 
         void setActive(int n = -1)

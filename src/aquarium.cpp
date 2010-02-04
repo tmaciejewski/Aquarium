@@ -88,7 +88,7 @@ void Aquarium::display() const
     for(std::vector<Fish*>::const_iterator it = fish.begin();
         it != fish.end(); ++it)
     {
-        if (*it != getFish(activeFish))
+        if (activeFish < 0 || *it != getFish(activeFish))
         {
             glUniform1f(xLocation, (*it)->getModel()->getCenter(0));
             (*it)->display();
