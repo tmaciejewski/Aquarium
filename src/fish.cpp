@@ -47,7 +47,7 @@ void Fish::display() const
 
 void Fish::update()
 {
-    static GLfloat speed = 0.05 * (1.0 + 0.1 * log(scale)), turnSpeed = speed;
+    static GLfloat speed = 0.01 * (1.0 + 0.1 * log(scale)), turnSpeed = speed;
 
     if (swimLen <= 0)
     {
