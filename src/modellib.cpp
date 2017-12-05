@@ -54,8 +54,8 @@ void ModelLib::loadLib(const char *p)
             if (fs::is_regular(it->status()) && it->path().extension() == ".obj")
             {
                 Model *m = new Model();
-                std::string modelPath = it->path().parent_path().directory_string();
-                std::string modelName = it->path().stem();
+                std::string modelPath = it->path().parent_path().string();
+                std::string modelName = it->path().stem().string();
                 m->loadObj(modelPath.c_str(), modelName.c_str());
                 model[modelName] = m;
             }

@@ -2,7 +2,9 @@
 
 Dependency: SDL (1.2), SDL_Image (1.2), Boost.Filesystem (>= 1.36)
 
-    g++  -DGL_GLEXT_PROTOTYPES -DDATADIR="\"data\"" -DPACKAGE_STRING="\"aqua\"" -o aquarium src/aqua.cpp src/aquarium.cpp src/fish.cpp src/model.cpp src/modellib.cpp -lGL -lGLU -lSDL -lboost_filesystem -lboost_system -lSDL_image
+cmake .
+make
+make install
 
 === Running ===
 

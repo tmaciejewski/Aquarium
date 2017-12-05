@@ -353,7 +353,7 @@ int main(int argc, char **argv)
 
     surface = setVideoMode();
 
-    SDL_WM_SetCaption(PACKAGE_STRING, NULL);
+    SDL_WM_SetCaption("Aquarium", NULL);
 
     initGL();
     resize(width, height);
