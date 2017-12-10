@@ -1,3 +1,5 @@
+#version 130
+
 uniform sampler2D tex;
 uniform bool textures, lighting;
 varying vec3 normal;
