@@ -27,7 +27,6 @@
 #include <SDL/SDL_image.h>
 #include "modellib.hpp"
 #include "aquarium.hpp"
-#include "../config.h"
 
 ModelLib modelLib;
 Aquarium aquarium;
